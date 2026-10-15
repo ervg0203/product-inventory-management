@@ -6,6 +6,7 @@ import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.entity.ProductEntity;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Component
 public class ProductMapper {
@@ -65,6 +66,27 @@ public class ProductMapper {
                 .returnPolicy(product.getReturnPolicy())
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
+                .errors(new ArrayList<>())
+                .isValid(true)
+                .build();
+    }
+
+    public ProductResponseDTO toResponseDTO(CreateProductRequestDTO product) {
+
+        return ProductResponseDTO.builder()
+                .sku(product.getSku())
+                .title(product.getTitle())
+                .description(product.getDescription())
+                .category(product.getCategory())
+                .price(product.getPrice())
+                .discountPercentage(product.getDiscountPercentage())
+                .rating(product.getRating())
+                .stock(product.getStock())
+                .brand(product.getBrand())
+                .availabilityStatus(product.getAvailabilityStatus())
+                .returnPolicy(product.getReturnPolicy())
+                .errors(product.getErrors())
+                .isValid(product.getIsValid())
                 .build();
     }
 

@@ -1,9 +1,10 @@
 package com.example.inventory.controller;
 
 import com.example.inventory.dto.request.CreateProductRequestDTO;
-import com.example.inventory.dto.response.ApiResponseDTO;
+import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.service.ProductService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,24 +20,12 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping
-    public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> getAllProducts() {
+    @PostMapping("create")
+    public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> createProduct(
+            @RequestBody CreateProductRequestDTO productRequestDTO
+    ) {
 
-        List<ProductResponseDTO> products = productService.getAllProducts();
-
-        ApiResponseDTO<List<ProductResponseDTO>> response =
-                new ApiResponseDTO<>(
-                        true,
-                        "Products fetched successfully",
-                        products);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping
-    public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> createProduct(@RequestBody CreateProductRequestDTO productRequest) {
-
-        ProductResponseDTO product = productService.createProduct(productRequest);
+        ProductResponseDTO product = productService.createProduct(productRequestDTO);
 
         ApiResponseDTO<ProductResponseDTO> response =
                 new ApiResponseDTO<>(
@@ -44,7 +33,23 @@ public class ProductController {
                         "Product created successfully",
                         product);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/create/multi")
+    public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> createProducts(
+            @RequestBody List<CreateProductRequestDTO> productRequestDTOs
+    ) {
+
+        List<ProductResponseDTO> products = productService.createProducts(productRequestDTOs);
+
+        ApiResponseDTO<List<ProductResponseDTO>> response =
+                new ApiResponseDTO<>(
+                        true,
+                        "Products created successfully",
+                        products);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 }
