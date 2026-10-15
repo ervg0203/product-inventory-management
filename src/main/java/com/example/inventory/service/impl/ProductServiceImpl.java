@@ -11,6 +11,7 @@ import com.example.inventory.repository.ProductRepository;
 import com.example.inventory.service.ProductService;
 import com.example.inventory.util.ProductValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
@@ -34,6 +36,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Page<ProductEntity> productPage = productRepository.findAll(PageRequest.of(page, size));
+        log.info("Fetched products page={}, size={}, totalRecords={}",
+                page, size, productPage.getTotalElements());
 
         return ProductPageResponseDTO.builder()
                 .products(productPage.getContent().stream()
@@ -50,6 +54,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDTO getProductById(String id) {
         ProductEntity productEntity = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
+        log.info("Fetched product id={}", id);
         return productMapper.toResponseDTO(productEntity);
     }
 
@@ -77,6 +82,8 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
 
         if (!invalidProducts.isEmpty()) {
+            log.info("Product validation failed for {} of {} products",
+                    invalidProducts.size(), productRequestDTOs.size());
             throw new ProductValidationException(invalidProducts);
         }
 
@@ -84,8 +91,25 @@ public class ProductServiceImpl implements ProductService {
                 .map(productMapper::toEntity)
                 .toList();
 
-        return productRepository.saveAll(productEntities).stream()
+        List<ProductResponseDTO> savedProducts = productRepository.saveAll(productEntities).stream()
                 .map(productMapper::toResponseDTO)
                 .toList();
+        log.info("Created {} products", savedProducts.size());
+        return savedProducts;
+    }
+
+    @Override
+    public void deleteProduct(String id) {
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException(id);
+        }
+        productRepository.deleteById(id);
+        log.info("Deleted product id={}", id);
+    }
+
+    @Override
+    public void deleteAllProducts() {
+        productRepository.deleteAll();
+        log.info("Deleted all products");
     }
 }

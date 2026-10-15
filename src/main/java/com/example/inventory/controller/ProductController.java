@@ -84,4 +84,33 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @DeleteMapping
+    public ResponseEntity<ApiResponseDTO<Void>> deleteAllProduct() {
+
+        productService.deleteAllProducts();
+
+        ApiResponseDTO<Void> response =
+                new ApiResponseDTO<>(
+                        true,
+                        "All products deleted successfully",
+                        null);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponseDTO<Void>> deleteProduct(
+            @PathVariable String id) {
+
+        productService.deleteProduct(id);
+
+        ApiResponseDTO<Void> response =
+                new ApiResponseDTO<>(
+                        true,
+                        "Product deleted successfully",
+                        null);
+
+        return ResponseEntity.ok(response);
+    }
+
 }
