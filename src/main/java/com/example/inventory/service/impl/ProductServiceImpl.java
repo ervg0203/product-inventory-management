@@ -1,6 +1,6 @@
 package com.example.inventory.service.impl;
 
-import com.example.inventory.dto.request.CreateProductRequestDTO;
+import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.response.ProductPageResponseDTO;
 import com.example.inventory.entity.ProductEntity;
@@ -54,13 +54,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDTO createProduct(CreateProductRequestDTO createProductRequestDTO) {
-        return createProducts(List.of(createProductRequestDTO)).getFirst();
+    public ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) {
+        return createProducts(List.of(productRequestDTO)).getFirst();
     }
 
     @Override
     public List<ProductResponseDTO> createProducts(
-            List<CreateProductRequestDTO> productRequestDTOs) {
+            List<ProductRequestDTO> productRequestDTOs) {
 
         if (productRequestDTOs == null || productRequestDTOs.isEmpty()) {
             throw new IllegalArgumentException("At least one product is required");

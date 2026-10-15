@@ -1,5 +1,5 @@
 package com.example.inventory.service;
-import com.example.inventory.dto.request.CreateProductRequestDTO;
+import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.response.ProductPageResponseDTO;
 
@@ -11,8 +11,8 @@ public interface ProductService {
 
     ProductResponseDTO getProductById(String id);
 
-    ProductResponseDTO createProduct(CreateProductRequestDTO createProductRequestDTO);
+    ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO);
 
-    List<ProductResponseDTO> createProducts(List<CreateProductRequestDTO> createProductRequestDTOs);
+    List<ProductResponseDTO> createProducts(List<ProductRequestDTO> productRequestDTOS);
 
 }

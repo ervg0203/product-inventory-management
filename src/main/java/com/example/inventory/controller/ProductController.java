@@ -1,6 +1,6 @@
 package com.example.inventory.controller;
 
-import com.example.inventory.dto.request.CreateProductRequestDTO;
+import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.response.ProductPageResponseDTO;
@@ -54,7 +54,7 @@ public class ProductController {
 
     @PostMapping("create")
     public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> createProduct(
-            @RequestBody CreateProductRequestDTO productRequestDTO
+            @RequestBody ProductRequestDTO productRequestDTO
     ) {
 
         ProductResponseDTO product = productService.createProduct(productRequestDTO);
@@ -70,7 +70,7 @@ public class ProductController {
 
     @PostMapping("/create/multi")
     public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> createProducts(
-            @RequestBody List<CreateProductRequestDTO> productRequestDTOs
+            @RequestBody List<ProductRequestDTO> productRequestDTOs
     ) {
 
         List<ProductResponseDTO> products = productService.createProducts(productRequestDTOs);

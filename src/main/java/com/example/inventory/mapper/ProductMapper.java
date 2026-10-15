@@ -1,7 +1,6 @@
 package com.example.inventory.mapper;
 
-import com.example.inventory.dto.request.CreateProductRequestDTO;
-import com.example.inventory.dto.request.UpdateProductRequestDTO;
+import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.entity.ProductEntity;
 import org.springframework.stereotype.Component;
@@ -11,7 +10,7 @@ import java.util.ArrayList;
 @Component
 public class ProductMapper {
 
-    public ProductEntity toEntity(CreateProductRequestDTO requestDTO) {
+    public ProductEntity toEntity(ProductRequestDTO requestDTO) {
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -32,7 +31,7 @@ public class ProductMapper {
                 .build();
     }
 
-    public void updateEntity(ProductEntity product, UpdateProductRequestDTO requestDTO) {
+    public void updateEntity(ProductEntity product, ProductRequestDTO requestDTO) {
 
         product.setSku(requestDTO.getSku());
         product.setTitle(requestDTO.getTitle());
@@ -71,7 +70,7 @@ public class ProductMapper {
                 .build();
     }
 
-    public ProductResponseDTO toResponseDTO(CreateProductRequestDTO product) {
+    public ProductResponseDTO toResponseDTO(ProductRequestDTO product) {
 
         return ProductResponseDTO.builder()
                 .sku(product.getSku())

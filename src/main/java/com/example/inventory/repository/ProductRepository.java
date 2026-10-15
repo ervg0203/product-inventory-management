@@ -12,11 +12,6 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends MongoRepository<ProductEntity, String> {
 
-    Optional<ProductEntity> findBySku(String sku);
-
     Page<ProductEntity> findAll(Pageable pageable);
 
-    boolean existsBySku(String sku);
-
-    boolean existsBySkuAndIdNot(String sku, String id);
 }

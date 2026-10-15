@@ -2,7 +2,7 @@ package com.example.inventory.util;
 
 import com.example.inventory.enums.ErrorMessage;
 import com.example.inventory.enums.ProductField;
-import com.example.inventory.dto.request.CreateProductRequestDTO;
+import com.example.inventory.dto.request.ProductRequestDTO;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 @Component
 public final class ProductValidator {
 
-    public void validate(CreateProductRequestDTO product) {
+    public void validate(ProductRequestDTO product) {
         if (product == null) {
             return;
         }
@@ -43,7 +43,7 @@ public final class ProductValidator {
         }
     }
 
-    private static void validateText(CreateProductRequestDTO product,
+    private static void validateText(ProductRequestDTO product,
                                      ProductField field, String value, int maxLength) {
         if (value == null || value.trim().isEmpty()) {
             addError(product, ErrorMessage.REQUIRED, field);
@@ -52,7 +52,7 @@ public final class ProductValidator {
         }
     }
 
-    private static void validateDecimal(CreateProductRequestDTO product,
+    private static void validateDecimal(ProductRequestDTO product,
                                         ProductField field, BigDecimal value,
                                         boolean inclusiveMinimum, BigDecimal maximum,
                                         int integerDigits,
@@ -73,7 +73,7 @@ public final class ProductValidator {
         }
     }
 
-    private static void addError(CreateProductRequestDTO product,
+    private static void addError(ProductRequestDTO product,
                                  ErrorMessage message, ProductField field,
                                  Object... arguments) {
         product.setIsValid(false);
