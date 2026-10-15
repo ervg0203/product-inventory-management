@@ -2,6 +2,8 @@ package com.example.inventory.repository;
 
 import com.example.inventory.entity.ProductEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,7 +14,7 @@ public interface ProductRepository extends MongoRepository<ProductEntity, String
 
     Optional<ProductEntity> findBySku(String sku);
 
-    List<ProductEntity> findAll();
+    Page<ProductEntity> findAll(Pageable pageable);
 
     boolean existsBySku(String sku);
 

@@ -3,6 +3,7 @@ package com.example.inventory.controller;
 import com.example.inventory.dto.request.CreateProductRequestDTO;
 import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
+import com.example.inventory.dto.response.ProductPageResponseDTO;
 import com.example.inventory.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,37 @@ public class ProductController {
 
     public ProductController(ProductService productService) {
         this.productService = productService;
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponseDTO<ProductPageResponseDTO>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        ProductPageResponseDTO products = productService.getAllProducts(page, size);
+
+        ApiResponseDTO<ProductPageResponseDTO> response =
+                new ApiResponseDTO<>(
+                        true,
+                        "Products fetched successfully",
+                        products);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> getProductById(
+            @PathVariable String id) {
+
+        ProductResponseDTO product = productService.getProductById(id);
+
+        ApiResponseDTO<ProductResponseDTO> response =
+                new ApiResponseDTO<>(
+                        true,
+                        "Product fetched successfully",
+                        product);
+
+        return ResponseEntity.ok(response);
+
     }
 
     @PostMapping("create")
