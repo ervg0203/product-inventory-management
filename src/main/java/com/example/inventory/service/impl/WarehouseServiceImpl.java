@@ -1,7 +1,7 @@
 package com.example.inventory.service.impl;
 
 import com.example.inventory.dto.request.WarehouseRequestDTO;
-import com.example.inventory.dto.response.WarehousePageResponseDTO;
+import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.dto.response.WarehouseResponseDTO;
 import com.example.inventory.entity.WarehouseEntity;
 import com.example.inventory.exception.WarehouseNotFoundException;
@@ -32,15 +32,15 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseValidator warehouseValidator;
 
     @Override
-    public WarehousePageResponseDTO getAllWarehouses(int page, int size) {
+    public PageResponseDTO<WarehouseResponseDTO> getAllWarehouses(int page, int size) {
         if (page < 0 || size < 1) {
             throw new IllegalArgumentException("Page must be zero or greater and size must be greater than zero");
         }
         Page<WarehouseEntity> warehousePage = warehouseRepository.findAll(PageRequest.of(page, size));
         log.info("Fetched warehouses page={}, size={}, totalRecords={}",
                 page, size, warehousePage.getTotalElements());
-        return WarehousePageResponseDTO.builder()
-                .warehouses(warehousePage.getContent().stream().map(warehouseMapper::toResponseDTO).toList())
+        return PageResponseDTO.<WarehouseResponseDTO>builder()
+                .content(warehousePage.getContent().stream().map(warehouseMapper::toResponseDTO).toList())
                 .totalRecords(warehousePage.getTotalElements())
                 .page(warehousePage.getNumber())
                 .pageSize(warehousePage.getSize())

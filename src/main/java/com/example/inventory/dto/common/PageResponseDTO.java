@@ -1,4 +1,4 @@
-package com.example.inventory.dto.response;
+package com.example.inventory.dto.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,9 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class WarehousePageResponseDTO {
+public class PageResponseDTO<T> {
 
-    private List<WarehouseResponseDTO> warehouses;
+    private List<T> content;
 
     private long totalRecords;
 

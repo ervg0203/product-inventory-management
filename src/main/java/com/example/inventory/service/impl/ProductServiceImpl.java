@@ -2,7 +2,7 @@ package com.example.inventory.service.impl;
 
 import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
-import com.example.inventory.dto.response.ProductPageResponseDTO;
+import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.entity.ProductEntity;
 import com.example.inventory.exception.ProductNotFoundException;
 import com.example.inventory.exception.ProductValidationException;
@@ -33,7 +33,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductValidator productValidator;
 
     @Override
-    public ProductPageResponseDTO getAllProducts(int page, int size) {
+    public PageResponseDTO<ProductResponseDTO> getAllProducts(int page, int size) {
 
         if (page < 0 || size < 1) {
             throw new IllegalArgumentException("Page must be zero or greater and size must be greater than zero");
@@ -43,8 +43,8 @@ public class ProductServiceImpl implements ProductService {
         log.info("Fetched products page={}, size={}, totalRecords={}",
                 page, size, productPage.getTotalElements());
 
-        return ProductPageResponseDTO.builder()
-                .products(productPage.getContent().stream()
+        return PageResponseDTO.<ProductResponseDTO>builder()
+                .content(productPage.getContent().stream()
                 .map(productMapper::toResponseDTO)
                 .toList())
                 .totalRecords(productPage.getTotalElements())

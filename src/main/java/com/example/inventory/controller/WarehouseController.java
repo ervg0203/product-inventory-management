@@ -2,7 +2,7 @@ package com.example.inventory.controller;
 
 import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.request.WarehouseRequestDTO;
-import com.example.inventory.dto.response.WarehousePageResponseDTO;
+import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.dto.response.WarehouseResponseDTO;
 import com.example.inventory.service.WarehouseService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class WarehouseController {
     private final WarehouseService warehouseService;
 
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<WarehousePageResponseDTO>> getAllWarehouses(
+    public ResponseEntity<ApiResponseDTO<PageResponseDTO<WarehouseResponseDTO>>> getAllWarehouses(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses fetched successfully",

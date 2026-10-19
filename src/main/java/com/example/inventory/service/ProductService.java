@@ -1,13 +1,13 @@
 package com.example.inventory.service;
 import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
-import com.example.inventory.dto.response.ProductPageResponseDTO;
+import com.example.inventory.dto.common.PageResponseDTO;
 
 import java.util.List;
 
 public interface ProductService {
 
-    ProductPageResponseDTO getAllProducts(int page, int size);
+    PageResponseDTO<ProductResponseDTO> getAllProducts(int page, int size);
 
     ProductResponseDTO getProductById(String id);
 

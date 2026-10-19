@@ -3,7 +3,7 @@ package com.example.inventory.controller;
 import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
-import com.example.inventory.dto.response.ProductPageResponseDTO;
+import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<ProductPageResponseDTO>> getAllProducts(
+    public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products fetched successfully",
