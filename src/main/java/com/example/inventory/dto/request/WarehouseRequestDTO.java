@@ -1,7 +1,11 @@
 package com.example.inventory.dto.request;
 
 import com.example.inventory.util.Errors;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +18,19 @@ import java.util.List;
 public class WarehouseRequestDTO {
 
     private String id;
+
     private String code;
+
     private String name;
+
     private String address;
+
     private String city;
+
     private String state;
+
     private String postalCode;
+
     private boolean active;
 
     @Builder.Default
