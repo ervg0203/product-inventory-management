@@ -2,6 +2,7 @@ package com.example.inventory.exception;
 
 import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
+import com.example.inventory.dto.response.WarehouseResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,6 +31,13 @@ public class GlobalExceptionHandler {
                         exception.getProducts()));
     }
 
+    @ExceptionHandler(WarehouseValidationException.class)
+    public ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> handleWarehouseValidation(
+            WarehouseValidationException exception) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(new ApiResponseDTO<>(false, exception.getMessage(), exception.getWarehouses()));
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponseDTO<Void>> handleIllegalArgument(IllegalArgumentException exception) {
         log.info("Invalid request: {}", exception.getMessage());
@@ -40,6 +48,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<ApiResponseDTO<Void>> handleProductNotFound(ProductNotFoundException exception) {
         log.info("Product not found: {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponseDTO<>(false, exception.getMessage(), null));
+    }
+
+    @ExceptionHandler(WarehouseNotFoundException.class)
+    public ResponseEntity<ApiResponseDTO<Void>> handleWarehouseNotFound(WarehouseNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiResponseDTO<>(false, exception.getMessage(), null));
     }
