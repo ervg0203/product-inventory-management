@@ -5,6 +5,7 @@ import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.service.ProductService;
+import com.example.inventory.config.PaginationProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +19,16 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final PaginationProperties paginationProperties;
 
     @GetMapping
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> getAllProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products fetched successfully",
-                productService.getAllProducts(page, size)));
+                productService.getAllProducts(
+                        page == null ? paginationProperties.getDefaultPage() : page,
+                        size == null ? paginationProperties.getDefaultPageSize() : size)));
     }
 
     @GetMapping("/{id}")

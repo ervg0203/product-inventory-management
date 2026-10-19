@@ -2,6 +2,7 @@ package com.example.inventory.service.impl;
 
 import com.example.inventory.dto.request.WarehouseRequestDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
+import com.example.inventory.config.PaginationProperties;
 import com.example.inventory.dto.response.WarehouseResponseDTO;
 import com.example.inventory.entity.WarehouseEntity;
 import com.example.inventory.exception.WarehouseNotFoundException;
@@ -30,11 +31,14 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
     private final WarehouseMapper warehouseMapper;
     private final WarehouseValidator warehouseValidator;
+    private final PaginationProperties paginationProperties;
 
     @Override
     public PageResponseDTO<WarehouseResponseDTO> getAllWarehouses(int page, int size) {
-        if (page < 0 || size < 1) {
-            throw new IllegalArgumentException("Page must be zero or greater and size must be greater than zero");
+        if (page < 0 || size < 1 || size > paginationProperties.getMaxPageSize()) {
+            throw new IllegalArgumentException(
+                    "Page must be zero or greater and size must be between 1 and "
+                            + paginationProperties.getMaxPageSize());
         }
         Page<WarehouseEntity> warehousePage = warehouseRepository.findAll(PageRequest.of(page, size));
         log.info("Fetched warehouses page={}, size={}, totalRecords={}",

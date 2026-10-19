@@ -3,6 +3,7 @@ package com.example.inventory.service.impl;
 import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
+import com.example.inventory.config.PaginationProperties;
 import com.example.inventory.entity.ProductEntity;
 import com.example.inventory.exception.ProductNotFoundException;
 import com.example.inventory.exception.ProductValidationException;
@@ -31,12 +32,15 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final ProductValidator productValidator;
+    private final PaginationProperties paginationProperties;
 
     @Override
     public PageResponseDTO<ProductResponseDTO> getAllProducts(int page, int size) {
 
-        if (page < 0 || size < 1) {
-            throw new IllegalArgumentException("Page must be zero or greater and size must be greater than zero");
+        if (page < 0 || size < 1 || size > paginationProperties.getMaxPageSize()) {
+            throw new IllegalArgumentException(
+                    "Page must be zero or greater and size must be between 1 and "
+                            + paginationProperties.getMaxPageSize());
         }
 
         Page<ProductEntity> productPage = productRepository.findAll(PageRequest.of(page, size));
