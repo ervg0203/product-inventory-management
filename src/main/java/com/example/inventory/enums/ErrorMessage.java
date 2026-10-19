@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorMessage {
 
     REQUIRED("%s is required"),
+    NOT_FOUND("%s does not exist"),
     TOO_LONG("%s is too long"),
     MUST_BE_POSITIVE("%s must be greater than zero"),
     NEGATIVE("%s cannot be negative"),

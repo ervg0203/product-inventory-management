@@ -1,6 +1,7 @@
 package com.example.inventory.dto.request;
 
 import com.example.inventory.util.Errors;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -13,6 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductRequestDTO {
+
+    private String id;
 
     private String sku;
 

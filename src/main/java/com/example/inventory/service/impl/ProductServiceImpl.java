@@ -16,8 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -96,6 +100,54 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
         log.info("Created {} products", savedProducts.size());
         return savedProducts;
+    }
+
+    public List<ProductResponseDTO> updateProducts(List<ProductRequestDTO> productRequestDTOS) {
+
+        if (productRequestDTOS == null || productRequestDTOS.isEmpty()) {
+            throw new IllegalArgumentException("At least one product is required");
+        }
+        if (productRequestDTOS.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("Product entries cannot be null");
+        }
+
+        Set<String> productIds = productRequestDTOS.stream()
+                .map(ProductRequestDTO::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        Map<String, ProductEntity> existingProducts = productRepository.findAllById(productIds).stream()
+                .collect(Collectors.toMap(ProductEntity::getId, product -> product));
+
+        Set<String> existingProductIds = existingProducts.keySet();
+
+        productRequestDTOS.forEach(product ->
+                productValidator.validateForUpdate(product, existingProductIds));
+
+        List<ProductResponseDTO> invalidProducts = productRequestDTOS.stream()
+                .filter(product -> !Boolean.TRUE.equals(product.getIsValid()))
+                .map(productMapper::toResponseDTO)
+                .toList();
+
+        if (!invalidProducts.isEmpty()) {
+            log.info("Product validation failed for {} of {} products",
+                    invalidProducts.size(), productRequestDTOS.size());
+            throw new ProductValidationException(invalidProducts);
+        }
+
+        productRequestDTOS.forEach(product ->
+                productMapper.updateEntity(existingProducts.get(product.getId()), product));
+
+        List<ProductEntity> productEntities = productRequestDTOS.stream()
+                .map(product -> existingProducts.get(product.getId()))
+                .toList();
+
+        List<ProductResponseDTO> updatedProducts = productRepository.saveAll(productEntities).stream()
+                .map(productMapper::toResponseDTO)
+                .toList();
+
+        log.info("Updated {} products", updatedProducts.size());
+        return updatedProducts;
     }
 
     @Override

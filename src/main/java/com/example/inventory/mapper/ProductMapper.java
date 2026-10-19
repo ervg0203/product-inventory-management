@@ -73,6 +73,7 @@ public class ProductMapper {
     public ProductResponseDTO toResponseDTO(ProductRequestDTO product) {
 
         return ProductResponseDTO.builder()
+                .id(product.getId())
                 .sku(product.getSku())
                 .title(product.getTitle())
                 .description(product.getDescription())

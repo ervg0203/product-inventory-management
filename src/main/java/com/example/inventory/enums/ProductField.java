@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ProductField {
 
+    ID("id", "Product ID"),
     SKU("sku", "SKU"),
     TITLE("title", "Product title"),
     DESCRIPTION("description", "Description"),

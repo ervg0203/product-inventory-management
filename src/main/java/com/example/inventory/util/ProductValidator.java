@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Set;
 
 @Component
 public final class ProductValidator {
@@ -40,6 +41,16 @@ public final class ProductValidator {
             addError(product, ErrorMessage.REQUIRED, ProductField.STOCK);
         } else if (product.getStock() < 0) {
             addError(product, ErrorMessage.NEGATIVE, ProductField.STOCK);
+        }
+    }
+
+    public void validateForUpdate(ProductRequestDTO product, Set<String> existingProductIds) {
+        validate(product);
+
+        if (product.getId() == null || product.getId().isBlank()) {
+            addError(product, ErrorMessage.REQUIRED, ProductField.ID);
+        } else if (existingProductIds == null || !existingProductIds.contains(product.getId())) {
+            addError(product, ErrorMessage.NOT_FOUND, ProductField.ID);
         }
     }
 

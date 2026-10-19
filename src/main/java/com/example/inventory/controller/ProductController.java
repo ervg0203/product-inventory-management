@@ -84,6 +84,21 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PutMapping("/multi")
+    public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> updateProducts(
+            @RequestBody List<ProductRequestDTO> productRequestDTOs
+    ) {
+        List<ProductResponseDTO> products = productService.updateProducts(productRequestDTOs);
+
+        ApiResponseDTO<List<ProductResponseDTO>> response =
+                new ApiResponseDTO<>(
+                        true,
+                        "Products updated successfully",
+                        products);
+
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping
     public ResponseEntity<ApiResponseDTO<Void>> deleteAllProduct() {
 
