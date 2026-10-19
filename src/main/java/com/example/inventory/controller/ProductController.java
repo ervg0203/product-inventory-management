@@ -52,7 +52,7 @@ public class ProductController {
 
     }
 
-    @PostMapping("create")
+    @PostMapping("/create")
     public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> createProduct(
             @RequestBody ProductRequestDTO productRequestDTO
     ) {
@@ -68,7 +68,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/create/multi")
+    @PostMapping("/create-multi")
     public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> createProducts(
             @RequestBody List<ProductRequestDTO> productRequestDTOs
     ) {
@@ -84,7 +84,22 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/multi")
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> updateProducts(
+            @RequestBody ProductRequestDTO productRequestDTOs
+    ) {
+        ProductResponseDTO products = productService.updateProduct(productRequestDTOs);
+
+        ApiResponseDTO<ProductResponseDTO> response =
+                new ApiResponseDTO<>(
+                        true,
+                        "Product updated successfully",
+                        products);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/update-multi")
     public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> updateProducts(
             @RequestBody List<ProductRequestDTO> productRequestDTOs
     ) {
@@ -99,7 +114,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/delete-all")
     public ResponseEntity<ApiResponseDTO<Void>> deleteAllProduct() {
 
         productService.deleteAllProducts();

@@ -71,25 +71,10 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponseDTO> createProducts(
             List<ProductRequestDTO> productRequestDTOs) {
 
-        if (productRequestDTOs == null || productRequestDTOs.isEmpty()) {
-            throw new IllegalArgumentException("At least one product is required");
-        }
-        if (productRequestDTOs.stream().anyMatch(Objects::isNull)) {
-            throw new IllegalArgumentException("Product entries cannot be null");
-        }
+        validateProductRequests(productRequestDTOs);
 
         productRequestDTOs.forEach(productValidator::validate);
-
-        List<ProductResponseDTO> invalidProducts = productRequestDTOs.stream()
-                .filter(product -> !Boolean.TRUE.equals(product.getIsValid()))
-                .map(productMapper::toResponseDTO)
-                .toList();
-
-        if (!invalidProducts.isEmpty()) {
-            log.info("Product validation failed for {} of {} products",
-                    invalidProducts.size(), productRequestDTOs.size());
-            throw new ProductValidationException(invalidProducts);
-        }
+        throwIfInvalid(productRequestDTOs);
 
         List<ProductEntity> productEntities = productRequestDTOs.stream()
                 .map(productMapper::toEntity)
@@ -102,14 +87,15 @@ public class ProductServiceImpl implements ProductService {
         return savedProducts;
     }
 
+    @Override
+    public ProductResponseDTO updateProduct(ProductRequestDTO productRequestDTOS) {
+        return updateProducts(List.of(productRequestDTOS)).getFirst();
+    }
+
+    @Override
     public List<ProductResponseDTO> updateProducts(List<ProductRequestDTO> productRequestDTOS) {
 
-        if (productRequestDTOS == null || productRequestDTOS.isEmpty()) {
-            throw new IllegalArgumentException("At least one product is required");
-        }
-        if (productRequestDTOS.stream().anyMatch(Objects::isNull)) {
-            throw new IllegalArgumentException("Product entries cannot be null");
-        }
+        validateProductRequests(productRequestDTOS);
 
         Set<String> productIds = productRequestDTOS.stream()
                 .map(ProductRequestDTO::getId)
@@ -123,17 +109,7 @@ public class ProductServiceImpl implements ProductService {
 
         productRequestDTOS.forEach(product ->
                 productValidator.validateForUpdate(product, existingProductIds));
-
-        List<ProductResponseDTO> invalidProducts = productRequestDTOS.stream()
-                .filter(product -> !Boolean.TRUE.equals(product.getIsValid()))
-                .map(productMapper::toResponseDTO)
-                .toList();
-
-        if (!invalidProducts.isEmpty()) {
-            log.info("Product validation failed for {} of {} products",
-                    invalidProducts.size(), productRequestDTOS.size());
-            throw new ProductValidationException(invalidProducts);
-        }
+        throwIfInvalid(productRequestDTOS);
 
         productRequestDTOS.forEach(product ->
                 productMapper.updateEntity(existingProducts.get(product.getId()), product));
@@ -148,6 +124,28 @@ public class ProductServiceImpl implements ProductService {
 
         log.info("Updated {} products", updatedProducts.size());
         return updatedProducts;
+    }
+
+    private void validateProductRequests(List<ProductRequestDTO> products) {
+        if (products == null || products.isEmpty()) {
+            throw new IllegalArgumentException("At least one product is required");
+        }
+        if (products.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("Product entries cannot be null");
+        }
+    }
+
+    private void throwIfInvalid(List<ProductRequestDTO> products) {
+        List<ProductResponseDTO> invalidProducts = products.stream()
+                .filter(product -> !Boolean.TRUE.equals(product.getIsValid()))
+                .map(productMapper::toResponseDTO)
+                .toList();
+
+        if (!invalidProducts.isEmpty()) {
+            log.info("Product validation failed for {} of {} products",
+                    invalidProducts.size(), products.size());
+            throw new ProductValidationException(invalidProducts);
+        }
     }
 
     @Override
