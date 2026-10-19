@@ -15,9 +15,7 @@ public enum ProductField {
     PRICE("price", "Price"),
     DISCOUNT_PERCENTAGE("discountPercentage", "Discount percentage"),
     RATING("rating", "Rating"),
-    STOCK("stock", "Stock"),
     BRAND("brand", "Brand"),
-    AVAILABILITY_STATUS("availabilityStatus", "Availability status"),
     RETURN_POLICY("returnPolicy", "Return policy");
 
     private final String value;

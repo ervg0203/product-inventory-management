@@ -31,11 +31,7 @@ public class ProductRequestDTO {
 
     private BigDecimal rating;
 
-    private Integer stock;
-
     private String brand;
-
-    private String availabilityStatus;
 
     private String returnPolicy;
 

@@ -33,11 +33,7 @@ public class ProductResponseDTO {
 
     private BigDecimal rating;
 
-    private Integer stock;
-
     private String brand;
-
-    private String availabilityStatus;
 
     private String returnPolicy;
 

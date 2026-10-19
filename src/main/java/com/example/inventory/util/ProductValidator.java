@@ -25,7 +25,6 @@ public final class ProductValidator {
         validateText(product, ProductField.DESCRIPTION, product.getDescription(), 2000);
         validateText(product, ProductField.CATEGORY, product.getCategory(), 100);
         validateText(product, ProductField.BRAND, product.getBrand(), 100);
-        validateText(product, ProductField.AVAILABILITY_STATUS, product.getAvailabilityStatus(), 30);
         validateText(product, ProductField.RETURN_POLICY, product.getReturnPolicy(), 150);
 
         validateDecimal(product, ProductField.PRICE, product.getPrice(),
@@ -37,11 +36,6 @@ public final class ProductValidator {
                 true, new BigDecimal("5"), 1,
                 ErrorMessage.NEGATIVE, ErrorMessage.TOO_HIGH);
 
-        if (product.getStock() == null) {
-            addError(product, ErrorMessage.REQUIRED, ProductField.STOCK);
-        } else if (product.getStock() < 0) {
-            addError(product, ErrorMessage.NEGATIVE, ProductField.STOCK);
-        }
     }
 
     public void validateForUpdate(ProductRequestDTO product, Set<String> existingProductIds) {

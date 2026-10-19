@@ -22,9 +22,7 @@ public class ProductMapper {
                 .price(requestDTO.getPrice())
                 .discountPercentage(requestDTO.getDiscountPercentage())
                 .rating(requestDTO.getRating())
-                .stock(requestDTO.getStock())
                 .brand(requestDTO.getBrand())
-                .availabilityStatus(requestDTO.getAvailabilityStatus())
                 .returnPolicy(requestDTO.getReturnPolicy())
                 .createdAt(now)
                 .updatedAt(now)
@@ -40,9 +38,7 @@ public class ProductMapper {
         product.setPrice(requestDTO.getPrice());
         product.setDiscountPercentage(requestDTO.getDiscountPercentage());
         product.setRating(requestDTO.getRating());
-        product.setStock(requestDTO.getStock());
         product.setBrand(requestDTO.getBrand());
-        product.setAvailabilityStatus(requestDTO.getAvailabilityStatus());
         product.setReturnPolicy(requestDTO.getReturnPolicy());
         product.setUpdatedAt(LocalDateTime.now());
 
@@ -59,9 +55,7 @@ public class ProductMapper {
                 .price(product.getPrice())
                 .discountPercentage(product.getDiscountPercentage())
                 .rating(product.getRating())
-                .stock(product.getStock())
                 .brand(product.getBrand())
-                .availabilityStatus(product.getAvailabilityStatus())
                 .returnPolicy(product.getReturnPolicy())
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
@@ -81,9 +75,7 @@ public class ProductMapper {
                 .price(product.getPrice())
                 .discountPercentage(product.getDiscountPercentage())
                 .rating(product.getRating())
-                .stock(product.getStock())
                 .brand(product.getBrand())
-                .availabilityStatus(product.getAvailabilityStatus())
                 .returnPolicy(product.getReturnPolicy())
                 .errors(product.getErrors())
                 .isValid(product.getIsValid())
