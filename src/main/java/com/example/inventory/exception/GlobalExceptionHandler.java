@@ -58,6 +58,18 @@ public class GlobalExceptionHandler {
                 .body(new ApiResponseDTO<>(false, exception.getMessage(), null));
     }
 
+    @ExceptionHandler({InventoryNotFoundException.class})
+    public ResponseEntity<ApiResponseDTO<Void>> handleInventoryNotFound(RuntimeException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponseDTO<>(false, exception.getMessage(), null));
+    }
+
+    @ExceptionHandler({InventoryConflictException.class, InsufficientStockException.class})
+    public ResponseEntity<ApiResponseDTO<Void>> handleInventoryConflict(RuntimeException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ApiResponseDTO<>(false, exception.getMessage(), null));
+    }
+
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<ApiResponseDTO<Void>> handleDuplicateKey(DuplicateKeyException exception) {
         log.warn("Duplicate product request detected");
