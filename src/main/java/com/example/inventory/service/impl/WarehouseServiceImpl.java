@@ -3,6 +3,7 @@ package com.example.inventory.service.impl;
 import com.example.inventory.dto.request.WarehouseRequestDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.config.PaginationProperties;
+import com.example.inventory.config.ImportProperties;
 import com.example.inventory.dto.response.WarehouseResponseDTO;
 import com.example.inventory.entity.WarehouseEntity;
 import com.example.inventory.exception.WarehouseNotFoundException;
@@ -35,6 +36,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseMapper warehouseMapper;
     private final WarehouseValidator warehouseValidator;
     private final PaginationProperties paginationProperties;
+    private final ImportProperties importProperties;
 
     @Override
     /**
@@ -112,6 +114,41 @@ public class WarehouseServiceImpl implements WarehouseService {
         return warehouseRepository.saveAll(requests.stream()
                         .map(request -> existing.get(request.getId())).toList())
                 .stream().map(warehouseMapper::toResponseDTO).toList();
+    }
+
+    @Override
+    public List<WarehouseResponseDTO> importWarehouses(List<WarehouseRequestDTO> warehouses) {
+        validateRequests(warehouses);
+        List<WarehouseRequestDTO> creates = warehouses.stream()
+                .filter(warehouse -> warehouse.getId() == null || warehouse.getId().isBlank())
+                .toList();
+        List<WarehouseRequestDTO> updates = warehouses.stream()
+                .filter(warehouse -> warehouse.getId() != null && !warehouse.getId().isBlank())
+                .toList();
+
+        creates.forEach(warehouseValidator::validate);
+        Set<String> updateIds = updates.stream()
+                .map(WarehouseRequestDTO::getId)
+                .collect(Collectors.toSet());
+        Map<String, WarehouseEntity> existing = warehouseRepository.findAllById(updateIds).stream()
+                .collect(Collectors.toMap(WarehouseEntity::getId, warehouse -> warehouse));
+        updates.forEach(warehouse ->
+                warehouseValidator.validateForUpdate(warehouse, existing.keySet()));
+        throwIfInvalid(warehouses);
+
+        if (importProperties.getBatchSize() < 1) {
+            throw new IllegalArgumentException("Import batch size must be greater than zero");
+        }
+        List<WarehouseResponseDTO> imported = new java.util.ArrayList<>();
+        for (int start = 0; start < creates.size(); start += importProperties.getBatchSize()) {
+            int end = Math.min(start + importProperties.getBatchSize(), creates.size());
+            imported.addAll(createWarehouses(creates.subList(start, end)));
+        }
+        for (int start = 0; start < updates.size(); start += importProperties.getBatchSize()) {
+            int end = Math.min(start + importProperties.getBatchSize(), updates.size());
+            imported.addAll(updateWarehouses(updates.subList(start, end)));
+        }
+        return imported;
     }
 
     @Override

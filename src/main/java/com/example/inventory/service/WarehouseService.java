@@ -13,6 +13,7 @@ public interface WarehouseService {
     List<WarehouseResponseDTO> createWarehouses(List<WarehouseRequestDTO> requests);
     WarehouseResponseDTO updateWarehouse(WarehouseRequestDTO request);
     List<WarehouseResponseDTO> updateWarehouses(List<WarehouseRequestDTO> requests);
+    List<WarehouseResponseDTO> importWarehouses(List<WarehouseRequestDTO> warehouses);
     void deleteWarehouse(String id);
     void deleteAllWarehouses();
 }

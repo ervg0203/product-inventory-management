@@ -4,6 +4,7 @@ import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.config.PaginationProperties;
+import com.example.inventory.config.ImportProperties;
 import com.example.inventory.entity.ProductEntity;
 import com.example.inventory.exception.ProductNotFoundException;
 import com.example.inventory.exception.ProductValidationException;
@@ -41,6 +42,7 @@ public class ProductServiceImpl implements ProductService {
     private final PaginationProperties paginationProperties;
     private final MongoTemplate mongoTemplate;
     private final SearchQueryBuilder searchQueryBuilder;
+    private final ImportProperties importProperties;
 
     @Override
     /**
@@ -180,6 +182,46 @@ public class ProductServiceImpl implements ProductService {
 
         log.info("Updated {} products", updatedProducts.size());
         return updatedProducts;
+    }
+
+    @Override
+    public List<ProductResponseDTO> importProducts(List<ProductRequestDTO> products) {
+        validateProductRequests(products);
+
+        List<ProductRequestDTO> creates = products.stream()
+                .filter(product -> product.getId() == null || product.getId().isBlank())
+                .toList();
+        List<ProductRequestDTO> updates = products.stream()
+                .filter(product -> product.getId() != null && !product.getId().isBlank())
+                .toList();
+
+        // Validate every row and resolve every update ID before any repository
+        // method is called. This prevents DTO validation errors in a later
+        // group or batch from allowing an earlier group to be saved.
+        creates.forEach(productValidator::validate);
+        Set<String> updateIds = updates.stream()
+                .map(ProductRequestDTO::getId)
+                .collect(Collectors.toSet());
+        Map<String, ProductEntity> existingProducts = productRepository.findAllById(updateIds).stream()
+                .collect(Collectors.toMap(ProductEntity::getId, product -> product));
+        updates.forEach(product ->
+                productValidator.validateForUpdate(product, existingProducts.keySet()));
+        throwIfInvalid(products);
+
+        if (importProperties.getBatchSize() < 1) {
+            throw new IllegalArgumentException("Import batch size must be greater than zero");
+        }
+
+        List<ProductResponseDTO> imported = new java.util.ArrayList<>();
+        for (int start = 0; start < creates.size(); start += importProperties.getBatchSize()) {
+            int end = Math.min(start + importProperties.getBatchSize(), creates.size());
+            imported.addAll(createProducts(creates.subList(start, end)));
+        }
+        for (int start = 0; start < updates.size(); start += importProperties.getBatchSize()) {
+            int end = Math.min(start + importProperties.getBatchSize(), updates.size());
+            imported.addAll(updateProducts(updates.subList(start, end)));
+        }
+        return imported;
     }
 
     private void validateProductRequests(List<ProductRequestDTO> products) {

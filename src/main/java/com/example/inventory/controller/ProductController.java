@@ -7,6 +7,7 @@ import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.service.ProductService;
 import com.example.inventory.config.PaginationProperties;
+import com.example.inventory.util.ProductExcelParser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class ProductController {
 
     private final ProductService productService;
     private final PaginationProperties paginationProperties;
+    private final ProductExcelParser productExcelParser;
 
     @GetMapping
     @Operation(summary = "Browse products",
@@ -168,6 +171,22 @@ public class ProductController {
             @RequestBody List<ProductRequestDTO> productRequestDTOs) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products updated successfully",
                 productService.updateProducts(productRequestDTOs)));
+    }
+
+    @PostMapping(value = "/import", consumes = "multipart/form-data")
+    @Operation(summary = "Import products from Excel",
+            description = "Reads product rows from an .xlsx file. Rows with an ID are updated; rows without an ID are created. "
+                    + "All rows are validated before any row is persisted.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Products imported successfully."),
+            @ApiResponse(responseCode = "400", description = "The file is empty, malformed, or has unsupported columns/values."),
+            @ApiResponse(responseCode = "422", description = "One or more product rows failed validation."),
+            @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable.")
+    })
+    public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> importProducts(
+            @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products imported successfully",
+                productService.importProducts(productExcelParser.parse(file))));
     }
 
     @DeleteMapping("/delete-all")

@@ -8,9 +8,15 @@ import java.util.List;
 @Getter
 public class WarehouseValidationException extends RuntimeException {
     private final List<WarehouseResponseDTO> warehouses;
+    private final int totalErrors;
+    private final int totalIncorrectDtos;
 
     public WarehouseValidationException(List<WarehouseResponseDTO> warehouses) {
         super("One or more warehouses failed validation");
         this.warehouses = warehouses;
+        this.totalIncorrectDtos = warehouses.size();
+        this.totalErrors = warehouses.stream()
+                .mapToInt(warehouse -> warehouse.getErrors() == null ? 0 : warehouse.getErrors().size())
+                .sum();
     }
 }

@@ -1,6 +1,7 @@
 package com.example.inventory.exception;
 
 import com.example.inventory.dto.common.ApiResponseDTO;
+import com.example.inventory.dto.common.ValidationErrorResponseDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.response.WarehouseResponseDTO;
 import org.springframework.http.HttpStatus;
@@ -27,24 +28,31 @@ public class GlobalExceptionHandler {
     /**
      * Provides the handle product validation operation.
      */
-    public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> handleProductValidation(
+    public ResponseEntity<ApiResponseDTO<ValidationErrorResponseDTO<ProductResponseDTO>>> handleProductValidation(
             ProductValidationException exception) {
         log.info("Returning validation errors for {} products", exception.getProducts().size());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ApiResponseDTO<>(
-                        false,
-                        exception.getMessage(),
-                        exception.getProducts()));
+                .body(new ApiResponseDTO<>(false, exception.getMessage(),
+                        ValidationErrorResponseDTO.<ProductResponseDTO>builder()
+                                .totalErrors(exception.getTotalErrors())
+                                .totalIncorrectDtos(exception.getTotalIncorrectDtos())
+                                .incorrectDtos(exception.getProducts())
+                                .build()));
     }
 
     @ExceptionHandler(WarehouseValidationException.class)
     /**
      * Provides the handle warehouse validation operation.
      */
-    public ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> handleWarehouseValidation(
+    public ResponseEntity<ApiResponseDTO<ValidationErrorResponseDTO<WarehouseResponseDTO>>> handleWarehouseValidation(
             WarehouseValidationException exception) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ApiResponseDTO<>(false, exception.getMessage(), exception.getWarehouses()));
+                .body(new ApiResponseDTO<>(false, exception.getMessage(),
+                        ValidationErrorResponseDTO.<WarehouseResponseDTO>builder()
+                                .totalErrors(exception.getTotalErrors())
+                                .totalIncorrectDtos(exception.getTotalIncorrectDtos())
+                                .incorrectDtos(exception.getWarehouses())
+                                .build()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

@@ -6,6 +6,7 @@ import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.dto.response.WarehouseResponseDTO;
 import com.example.inventory.service.WarehouseService;
 import com.example.inventory.config.PaginationProperties;
+import com.example.inventory.util.WarehouseExcelParser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -28,6 +30,7 @@ public class WarehouseController {
 
     private final WarehouseService warehouseService;
     private final PaginationProperties paginationProperties;
+    private final WarehouseExcelParser warehouseExcelParser;
 
     @GetMapping
     @Operation(summary = "Browse warehouses",
@@ -149,6 +152,22 @@ public class WarehouseController {
             @RequestBody List<WarehouseRequestDTO> requests) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses updated successfully",
                 warehouseService.updateWarehouses(requests)));
+    }
+
+    @PostMapping(value = "/import", consumes = "multipart/form-data")
+    @Operation(summary = "Import warehouses from Excel",
+            description = "Rows with an ID are updated and rows without an ID are created. "
+                    + "All rows are validated before any row is persisted.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Warehouses imported successfully."),
+            @ApiResponse(responseCode = "400", description = "The file is empty, malformed, or has unsupported columns."),
+            @ApiResponse(responseCode = "422", description = "One or more warehouse rows failed validation."),
+            @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable.")
+    })
+    public ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> importWarehouses(
+            @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses imported successfully",
+                warehouseService.importWarehouses(warehouseExcelParser.parse(file))));
     }
 
     @DeleteMapping("/delete-all")
