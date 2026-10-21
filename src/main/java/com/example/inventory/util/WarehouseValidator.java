@@ -9,8 +9,14 @@ import java.util.ArrayList;
 import java.util.Set;
 
 @Component
+/**
+ * Provides the warehouse validator component.
+ */
 public class WarehouseValidator {
 
+    /**
+     * Performs the validate operation.
+     */
     public void validate(WarehouseRequestDTO warehouse) {
         if (warehouse == null) {
             return;
@@ -25,6 +31,9 @@ public class WarehouseValidator {
         validateText(warehouse, WarehouseField.POSTAL_CODE, warehouse.getPostalCode(), 20);
     }
 
+    /**
+     * Performs the validate for update operation.
+     */
     public void validateForUpdate(WarehouseRequestDTO warehouse, Set<String> existingIds) {
         validate(warehouse);
         if (warehouse == null) {

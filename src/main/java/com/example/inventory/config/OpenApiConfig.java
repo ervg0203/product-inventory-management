@@ -5,9 +5,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+/**
+ * Provides the open api config component.
+ */
 public class OpenApiConfig {
 
     @Bean
+    /**
+     * Returns the result of the product inventory open api operation.
+     */
     public OpenAPI productInventoryOpenAPI() {
         return new OpenAPI()
                 .info(new Info()

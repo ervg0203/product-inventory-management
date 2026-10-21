@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
+/**
+ * Represents the warehouse field options.
+ */
 public enum WarehouseField {
     ID("id", "Warehouse ID"),
     CODE("code", "Warehouse code"),

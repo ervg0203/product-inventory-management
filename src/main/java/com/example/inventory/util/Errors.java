@@ -11,6 +11,9 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+/**
+ * Provides the errors component.
+ */
 public class Errors {
 
     private String message;

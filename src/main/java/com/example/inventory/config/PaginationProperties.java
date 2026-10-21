@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 @ConfigurationProperties(prefix = "inventory.pagination")
+/**
+ * Provides the pagination properties component.
+ */
 public class PaginationProperties {
 
     private int defaultPage = 0;

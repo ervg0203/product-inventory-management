@@ -21,6 +21,9 @@ import java.util.List;
 @RequestMapping("/api/v1/warehouses")
 @RequiredArgsConstructor
 @Tag(name = "Warehouses", description = "Manage warehouses used to store and organize inventory.")
+/**
+ * Provides the warehouse controller component.
+ */
 public class WarehouseController {
 
     private final WarehouseService warehouseService;
@@ -35,6 +38,9 @@ public class WarehouseController {
             @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the get all warehouses endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<WarehouseResponseDTO>>> getAllWarehouses(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
@@ -53,6 +59,9 @@ public class WarehouseController {
             @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the get warehouse by id endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<WarehouseResponseDTO>> getWarehouseById(@PathVariable String id) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouse fetched successfully",
                 warehouseService.getWarehouseById(id)));
@@ -69,6 +78,9 @@ public class WarehouseController {
             @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the create warehouse endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<WarehouseResponseDTO>> createWarehouse(
             @RequestBody WarehouseRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -87,6 +99,9 @@ public class WarehouseController {
             @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the create warehouses endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> createWarehouses(
             @RequestBody List<WarehouseRequestDTO> requests) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -106,6 +121,9 @@ public class WarehouseController {
             @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the update warehouse endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<WarehouseResponseDTO>> updateWarehouse(
             @RequestBody WarehouseRequestDTO request) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouse updated successfully",
@@ -124,6 +142,9 @@ public class WarehouseController {
             @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the update warehouses endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> updateWarehouses(
             @RequestBody List<WarehouseRequestDTO> requests) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses updated successfully",
@@ -138,6 +159,9 @@ public class WarehouseController {
             @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the delete all warehouses endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<Void>> deleteAllWarehouses() {
         warehouseService.deleteAllWarehouses();
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "All warehouses deleted successfully", null));
@@ -152,6 +176,9 @@ public class WarehouseController {
             @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the delete warehouse endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<Void>> deleteWarehouse(@PathVariable String id) {
         warehouseService.deleteWarehouse(id);
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouse deleted successfully", null));

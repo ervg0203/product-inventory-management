@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
+/**
+ * Represents the error message options.
+ */
 public enum ErrorMessage {
 
     REQUIRED("%s is required"),
@@ -17,6 +20,9 @@ public enum ErrorMessage {
 
     private final String value;
 
+    /**
+     * Returns the result of the format operation.
+     */
     public String format(Object... arguments) {
         return String.format(value, arguments);
     }

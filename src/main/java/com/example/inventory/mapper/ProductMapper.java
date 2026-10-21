@@ -8,8 +8,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Component
+/**
+ * Provides the product mapper component.
+ */
 public class ProductMapper {
 
+    /**
+     * Returns the result of the to entity operation.
+     */
     public ProductEntity toEntity(ProductRequestDTO requestDTO) {
 
         LocalDateTime now = LocalDateTime.now();
@@ -29,6 +35,9 @@ public class ProductMapper {
                 .build();
     }
 
+    /**
+     * Performs the update entity operation.
+     */
     public void updateEntity(ProductEntity product, ProductRequestDTO requestDTO) {
 
         product.setSku(requestDTO.getSku());
@@ -44,6 +53,9 @@ public class ProductMapper {
 
     }
 
+    /**
+     * Returns the result of the to response dto operation.
+     */
     public ProductResponseDTO toResponseDTO(ProductEntity product) {
 
         return ProductResponseDTO.builder()
@@ -64,6 +76,9 @@ public class ProductMapper {
                 .build();
     }
 
+    /**
+     * Returns the result of the to response dto operation.
+     */
     public ProductResponseDTO toResponseDTO(ProductRequestDTO product) {
 
         return ProductResponseDTO.builder()

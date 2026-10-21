@@ -9,8 +9,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Component
+/**
+ * Provides the warehouse mapper component.
+ */
 public class WarehouseMapper {
 
+    /**
+     * Returns the result of the to entity operation.
+     */
     public WarehouseEntity toEntity(WarehouseRequestDTO request) {
         LocalDateTime now = LocalDateTime.now();
         return WarehouseEntity.builder()
@@ -26,6 +32,9 @@ public class WarehouseMapper {
                 .build();
     }
 
+    /**
+     * Performs the update entity operation.
+     */
     public void updateEntity(WarehouseEntity entity, WarehouseRequestDTO request) {
         entity.setCode(request.getCode());
         entity.setName(request.getName());
@@ -37,6 +46,9 @@ public class WarehouseMapper {
         entity.setUpdatedAt(LocalDateTime.now());
     }
 
+    /**
+     * Returns the result of the to response dto operation.
+     */
     public WarehouseResponseDTO toResponseDTO(WarehouseEntity entity) {
         return WarehouseResponseDTO.builder()
                 .id(entity.getId())
@@ -54,6 +66,9 @@ public class WarehouseMapper {
                 .build();
     }
 
+    /**
+     * Returns the result of the to response dto operation.
+     */
     public WarehouseResponseDTO toResponseDTO(WarehouseRequestDTO request) {
         return WarehouseResponseDTO.builder()
                 .id(request.getId())

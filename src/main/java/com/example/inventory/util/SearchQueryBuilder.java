@@ -18,8 +18,14 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @Component
+/**
+ * Provides the search query builder component.
+ */
 public class SearchQueryBuilder {
 
+    /**
+     * Returns the result of the build operation.
+     */
     public Query build(ProductSearchRequestDTO request) {
         Query query = new Query();
         if (request.getFilters() != null) {

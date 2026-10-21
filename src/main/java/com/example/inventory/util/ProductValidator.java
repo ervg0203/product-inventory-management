@@ -10,8 +10,14 @@ import java.util.ArrayList;
 import java.util.Set;
 
 @Component
+/**
+ * Provides the product validator component.
+ */
 public final class ProductValidator {
 
+    /**
+     * Performs the validate operation.
+     */
     public void validate(ProductRequestDTO product) {
         if (product == null) {
             return;
@@ -38,6 +44,9 @@ public final class ProductValidator {
 
     }
 
+    /**
+     * Performs the validate for update operation.
+     */
     public void validateForUpdate(ProductRequestDTO product, Set<String> existingProductIds) {
         validate(product);
 

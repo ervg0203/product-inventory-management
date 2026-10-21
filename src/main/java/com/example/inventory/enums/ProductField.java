@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
+/**
+ * Represents the product field options.
+ */
 public enum ProductField {
 
     ID("id", "Product ID"),
@@ -25,6 +28,9 @@ public enum ProductField {
     private final String label;
 
     @JsonCreator
+    /**
+     * Returns the result of the from value operation.
+     */
     public static ProductField fromValue(String value) {
         if (value == null) {
             return null;

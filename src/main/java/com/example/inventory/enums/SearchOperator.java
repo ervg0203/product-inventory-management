@@ -2,6 +2,9 @@ package com.example.inventory.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+/**
+ * Represents the search operator options.
+ */
 public enum SearchOperator {
     EQUALS, NOT_EQUALS, CONTAINS, STARTS_WITH, ENDS_WITH,
     GREATER_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN, LESS_THAN_OR_EQUAL,
@@ -10,6 +13,9 @@ public enum SearchOperator {
     ;
 
     @JsonCreator
+    /**
+     * Returns the result of the from value operation.
+     */
     public static SearchOperator fromValue(String value) {
         if (value == null) {
             return null;

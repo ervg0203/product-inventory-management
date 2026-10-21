@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+/**
+ * Provides the warehouse service impl component.
+ */
 public class WarehouseServiceImpl implements WarehouseService {
 
     private final WarehouseRepository warehouseRepository;
@@ -34,6 +37,9 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final PaginationProperties paginationProperties;
 
     @Override
+    /**
+     * Returns the result of the get all warehouses operation.
+     */
     public PageResponseDTO<WarehouseResponseDTO> getAllWarehouses(int page, int size) {
         if (page < 0 || size < 1 || size > paginationProperties.getMaxPageSize()) {
             throw new IllegalArgumentException(
@@ -53,6 +59,9 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    /**
+     * Returns the result of the get warehouse by id operation.
+     */
     public WarehouseResponseDTO getWarehouseById(String id) {
         return warehouseRepository.findById(id)
                 .map(warehouseMapper::toResponseDTO)
@@ -60,11 +69,17 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    /**
+     * Returns the result of the create warehouse operation.
+     */
     public WarehouseResponseDTO createWarehouse(WarehouseRequestDTO request) {
         return createWarehouses(List.of(request)).getFirst();
     }
 
     @Override
+    /**
+     * Returns the result of the create warehouses operation.
+     */
     public List<WarehouseResponseDTO> createWarehouses(List<WarehouseRequestDTO> requests) {
         validateRequests(requests);
         requests.forEach(warehouseValidator::validate);
@@ -74,11 +89,17 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    /**
+     * Returns the result of the update warehouse operation.
+     */
     public WarehouseResponseDTO updateWarehouse(WarehouseRequestDTO request) {
         return updateWarehouses(List.of(request)).getFirst();
     }
 
     @Override
+    /**
+     * Returns the result of the update warehouses operation.
+     */
     public List<WarehouseResponseDTO> updateWarehouses(List<WarehouseRequestDTO> requests) {
         validateRequests(requests);
         Set<String> ids = requests.stream().map(WarehouseRequestDTO::getId)
@@ -94,6 +115,9 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    /**
+     * Performs the delete warehouse operation.
+     */
     public void deleteWarehouse(String id) {
         if (!warehouseRepository.existsById(id)) {
             throw new WarehouseNotFoundException(id);
@@ -103,6 +127,9 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    /**
+     * Performs the delete all warehouses operation.
+     */
     public void deleteAllWarehouses() {
         warehouseRepository.deleteAll();
         log.info("Deleted all warehouses");

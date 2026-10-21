@@ -30,6 +30,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+/**
+ * Provides the product service impl component.
+ */
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
@@ -40,6 +43,9 @@ public class ProductServiceImpl implements ProductService {
     private final SearchQueryBuilder searchQueryBuilder;
 
     @Override
+    /**
+     * Returns the result of the search products operation.
+     */
     public PageResponseDTO<ProductResponseDTO> searchProducts(ProductSearchRequestDTO request) {
         if (request == null) throw new IllegalArgumentException("Search request cannot be null");
         int page = request.getPage() == null ? paginationProperties.getDefaultPage() : request.getPage();
@@ -65,6 +71,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    /**
+     * Returns the result of the get all products operation.
+     */
     public PageResponseDTO<ProductResponseDTO> getAllProducts(int page, int size) {
 
         validatePage(page, size);
@@ -87,6 +96,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    /**
+     * Returns the result of the get product by id operation.
+     */
     public ProductResponseDTO getProductById(String id) {
         ProductEntity productEntity = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
@@ -95,11 +107,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    /**
+     * Returns the result of the create product operation.
+     */
     public ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) {
         return createProducts(List.of(productRequestDTO)).getFirst();
     }
 
     @Override
+    /**
+     * Provides the create products operation.
+     */
     public List<ProductResponseDTO> createProducts(
             List<ProductRequestDTO> productRequestDTOs) {
 
@@ -120,11 +138,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    /**
+     * Returns the result of the update product operation.
+     */
     public ProductResponseDTO updateProduct(ProductRequestDTO productRequestDTOS) {
         return updateProducts(List.of(productRequestDTOS)).getFirst();
     }
 
     @Override
+    /**
+     * Returns the result of the update products operation.
+     */
     public List<ProductResponseDTO> updateProducts(List<ProductRequestDTO> productRequestDTOS) {
 
         validateProductRequests(productRequestDTOS);
@@ -181,6 +205,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    /**
+     * Performs the delete product operation.
+     */
     public void deleteProduct(String id) {
         if (!productRepository.existsById(id)) {
             throw new ProductNotFoundException(id);
@@ -190,6 +217,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    /**
+     * Performs the delete all products operation.
+     */
     public void deleteAllProducts() {
         productRepository.deleteAll();
         log.info("Deleted all products");

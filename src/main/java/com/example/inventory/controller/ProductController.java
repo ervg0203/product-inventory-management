@@ -22,6 +22,9 @@ import java.util.List;
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
 @Tag(name = "Products", description = "Manage the product catalog, including creation, updates, lookup, pagination, and deletion.")
+/**
+ * Provides the product controller component.
+ */
 public class ProductController {
 
     private final ProductService productService;
@@ -36,6 +39,9 @@ public class ProductController {
             @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the get all products endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> getAllProducts(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
@@ -53,6 +59,9 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "Invalid search criteria, pagination, sorting, or value type."),
             @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable.")
     })
+    /**
+     * Handles the search products endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> searchProducts(
             @RequestBody ProductSearchRequestDTO request) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products searched successfully",
@@ -68,6 +77,9 @@ public class ProductController {
             @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the get product by id endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> getProductById(
             @PathVariable String id) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Product fetched successfully",
@@ -85,6 +97,9 @@ public class ProductController {
             @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the create product endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> createProduct(
             @RequestBody ProductRequestDTO productRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -103,6 +118,9 @@ public class ProductController {
             @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the create products endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> createProducts(
             @RequestBody List<ProductRequestDTO> productRequestDTOs) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -122,6 +140,9 @@ public class ProductController {
             @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the update products endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> updateProducts(
             @RequestBody ProductRequestDTO productRequestDTOs) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Product updated successfully",
@@ -140,6 +161,9 @@ public class ProductController {
             @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the update products endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> updateProducts(
             @RequestBody List<ProductRequestDTO> productRequestDTOs) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products updated successfully",
@@ -154,6 +178,9 @@ public class ProductController {
             @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the delete all product endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<Void>> deleteAllProduct() {
         productService.deleteAllProducts();
         return ResponseEntity.ok(new ApiResponseDTO<>(true,
@@ -169,6 +196,9 @@ public class ProductController {
             @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the delete product endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<Void>> deleteProduct(
             @PathVariable String id) {
         productService.deleteProduct(id);

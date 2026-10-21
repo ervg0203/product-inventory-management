@@ -23,6 +23,9 @@ import java.util.List;
 @RequestMapping("/api/v1/inventory")
 @RequiredArgsConstructor
 @Tag(name = "Inventory", description = "Manage stock held for products across warehouses.")
+/**
+ * Provides the inventory controller component.
+ */
 public class InventoryController {
 
     private final InventoryService inventoryService;
@@ -37,6 +40,9 @@ public class InventoryController {
             @ApiResponse(responseCode = "503", description = "Inventory data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the create inventory endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<InventoryResponseDTO>> createInventory(
             @Valid @RequestBody InventoryRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -52,6 +58,9 @@ public class InventoryController {
             @ApiResponse(responseCode = "503", description = "Inventory data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the get inventory endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<InventoryResponseDTO>> getInventory(
             @PathVariable String inventoryId) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Inventory fetched successfully",
@@ -67,6 +76,9 @@ public class InventoryController {
             @ApiResponse(responseCode = "503", description = "Inventory data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the get product stock endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<ProductStockResponseDTO>> getProductStock(
             @PathVariable String productId) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Product stock fetched successfully",
@@ -82,6 +94,9 @@ public class InventoryController {
             @ApiResponse(responseCode = "503", description = "Inventory data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the get warehouse inventory endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> getWarehouseInventory(
             @PathVariable String warehouseId) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouse inventory fetched successfully",
@@ -99,6 +114,9 @@ public class InventoryController {
             @ApiResponse(responseCode = "503", description = "Inventory data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the set stock endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<InventoryResponseDTO>> setStock(
             @PathVariable String inventoryId,
             @Valid @RequestBody SetStockRequestDTO request) {
@@ -117,6 +135,9 @@ public class InventoryController {
             @ApiResponse(responseCode = "503", description = "Inventory data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the increase stock endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<InventoryResponseDTO>> increaseStock(
             @PathVariable String inventoryId,
             @Valid @RequestBody StockAdjustmentRequestDTO request) {
@@ -135,6 +156,9 @@ public class InventoryController {
             @ApiResponse(responseCode = "503", description = "Inventory data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the decrease stock endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<InventoryResponseDTO>> decreaseStock(
             @PathVariable String inventoryId,
             @Valid @RequestBody StockAdjustmentRequestDTO request) {
@@ -152,6 +176,9 @@ public class InventoryController {
             @ApiResponse(responseCode = "503", description = "Inventory data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the get low stock endpoint.
+     */
     public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> getLowStock(
             @RequestParam int threshold,
             @RequestParam(required = false) String warehouseId) {
@@ -168,6 +195,9 @@ public class InventoryController {
             @ApiResponse(responseCode = "503", description = "Inventory data is temporarily unavailable."),
             @ApiResponse(responseCode = "500", description = "Unexpected server error.")
     })
+    /**
+     * Handles the delete inventory endpoint.
+     */
     public ResponseEntity<Void> deleteInventory(@PathVariable String inventoryId) {
         inventoryService.deleteInventory(inventoryId);
         return ResponseEntity.noContent().build();

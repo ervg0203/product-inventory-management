@@ -32,6 +32,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+/**
+ * Provides the inventory service impl component.
+ */
 public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
@@ -41,6 +44,9 @@ public class InventoryServiceImpl implements InventoryService {
     private final MongoTemplate mongoTemplate;
 
     @Override
+    /**
+     * Returns the result of the create inventory operation.
+     */
     public InventoryResponseDTO createInventory(InventoryRequestDTO request) {
         requireProduct(request.getProductId());
         requireActiveWarehouse(request.getWarehouseId());
@@ -61,6 +67,9 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    /**
+     * Returns the result of the get inventory by id operation.
+     */
     public InventoryResponseDTO getInventoryById(String inventoryId) {
         return inventoryRepository.findById(inventoryId)
                 .map(inventoryMapper::toResponseDTO)
@@ -68,6 +77,9 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    /**
+     * Returns the result of the get product stock operation.
+     */
     public ProductStockResponseDTO getProductStock(String productId) {
         requireProduct(productId);
         List<InventoryResponseDTO> inventory = inventoryRepository.findByProductId(productId)
@@ -82,6 +94,9 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    /**
+     * Returns the result of the get warehouse inventory operation.
+     */
     public List<InventoryResponseDTO> getWarehouseInventory(String warehouseId) {
         requireWarehouse(warehouseId);
         return inventoryRepository.findByWarehouseId(warehouseId).stream()
@@ -90,11 +105,17 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    /**
+     * Returns the result of the set stock operation.
+     */
     public InventoryResponseDTO setStock(String inventoryId, SetStockRequestDTO request) {
         InventoryEntity inventory = requireInventory(inventoryId);
         requireActiveWarehouse(inventory.getWarehouseId());
         InventoryEntity updated = mongoTemplate.findAndModify(
                 Query.query(Criteria.where("_id").is(inventoryId)),
+                /**
+                 * Provides the update operation.
+                 */
                 new Update().set("quantity", request.getQuantity())
                         .set("updatedAt", LocalDateTime.now()),
                 org.springframework.data.mongodb.core.FindAndModifyOptions.options().returnNew(true),
@@ -103,6 +124,9 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    /**
+     * Returns the result of the increase stock operation.
+     */
     public InventoryResponseDTO increaseStock(String inventoryId, StockAdjustmentRequestDTO request) {
         InventoryEntity inventory = requireInventory(inventoryId);
         requireActiveWarehouse(inventory.getWarehouseId());
@@ -110,6 +134,9 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    /**
+     * Returns the result of the decrease stock operation.
+     */
     public InventoryResponseDTO decreaseStock(String inventoryId, StockAdjustmentRequestDTO request) {
         InventoryEntity inventory = requireInventory(inventoryId);
         requireActiveWarehouse(inventory.getWarehouseId());
@@ -117,6 +144,9 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    /**
+     * Returns the result of the get low stock operation.
+     */
     public List<InventoryResponseDTO> getLowStock(int threshold, String warehouseId) {
         if (threshold < 0) {
             throw new IllegalArgumentException("Threshold must be non-negative");
@@ -131,6 +161,9 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    /**
+     * Performs the delete inventory operation.
+     */
     public void deleteInventory(String inventoryId) {
         requireInventory(inventoryId);
         inventoryRepository.deleteById(inventoryId);
@@ -143,6 +176,9 @@ public class InventoryServiceImpl implements InventoryService {
         }
         var result = mongoTemplate.updateFirst(
                 Query.query(criteria),
+                /**
+                 * Provides the update operation.
+                 */
                 new Update().inc("quantity", decrease ? -amount : amount)
                         .set("updatedAt", LocalDateTime.now()),
                 InventoryEntity.class);
