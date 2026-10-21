@@ -16,7 +16,9 @@ public enum ProductField {
     DISCOUNT_PERCENTAGE("discountPercentage", "Discount percentage"),
     RATING("rating", "Rating"),
     BRAND("brand", "Brand"),
-    RETURN_POLICY("returnPolicy", "Return policy");
+    RETURN_POLICY("returnPolicy", "Return policy"),
+    CREATED_AT("createdAt", "Created at"),
+    UPDATED_AT("updatedAt", "Updated at");
 
     private final String value;
     private final String label;

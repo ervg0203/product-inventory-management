@@ -22,4 +22,8 @@ public class PageResponseDTO<T> {
     private int pageSize;
 
     private int totalPages;
+
+    private boolean first;
+
+    private boolean last;
 }

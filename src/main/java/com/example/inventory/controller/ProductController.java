@@ -1,6 +1,7 @@
 package com.example.inventory.controller;
 
 import com.example.inventory.dto.request.ProductRequestDTO;
+import com.example.inventory.dto.request.ProductSearchRequestDTO;
 import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
@@ -42,6 +43,20 @@ public class ProductController {
                 productService.getAllProducts(
                         page == null ? paginationProperties.getDefaultPage() : page,
                         size == null ? paginationProperties.getDefaultPageSize() : size)));
+    }
+
+    @PostMapping("/search")
+    @Operation(summary = "Search products", description = "Searches products using allowlisted fields and operators. "
+            + "Filters use AND semantics; page is zero-based and size is limited to 100.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Products searched successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid search criteria, pagination, sorting, or value type."),
+            @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable.")
+    })
+    public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> searchProducts(
+            @RequestBody ProductSearchRequestDTO request) {
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products searched successfully",
+                productService.searchProducts(request)));
     }
 
     @GetMapping("/{id}")

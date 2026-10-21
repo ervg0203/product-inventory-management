@@ -16,8 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import com.example.inventory.dto.request.ProductSearchRequestDTO;
+import com.example.inventory.util.SearchQueryBuilder;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,15 +36,38 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ProductValidator productValidator;
     private final PaginationProperties paginationProperties;
+    private final MongoTemplate mongoTemplate;
+    private final SearchQueryBuilder searchQueryBuilder;
+
+    @Override
+    public PageResponseDTO<ProductResponseDTO> searchProducts(ProductSearchRequestDTO request) {
+        if (request == null) throw new IllegalArgumentException("Search request cannot be null");
+        int page = request.getPage() == null ? paginationProperties.getDefaultPage() : request.getPage();
+        int size = request.getSize() == null ? paginationProperties.getDefaultPageSize() : request.getSize();
+        validatePage(page, size);
+
+        Query query = searchQueryBuilder.build(request);
+        long total = mongoTemplate.count(Query.of(query), ProductEntity.class);
+        query.skip((long) page * size).limit(size);
+        List<ProductResponseDTO> content = mongoTemplate.find(query, ProductEntity.class).stream()
+                .map(productMapper::toResponseDTO).toList();
+        int totalPages = (int) Math.ceil((double) total / size);
+        return PageResponseDTO.<ProductResponseDTO>builder().content(content).totalRecords(total)
+                .page(page).pageSize(size).totalPages(totalPages)
+                .first(page == 0).last(totalPages == 0 || page >= totalPages - 1).build();
+    }
+
+    private void validatePage(int page, int size) {
+        if (page < 0 || size < 1 || size > paginationProperties.getMaxPageSize()) {
+            throw new IllegalArgumentException("Page must be zero or greater and size must be between 1 and "
+                    + paginationProperties.getMaxPageSize());
+        }
+    }
 
     @Override
     public PageResponseDTO<ProductResponseDTO> getAllProducts(int page, int size) {
 
-        if (page < 0 || size < 1 || size > paginationProperties.getMaxPageSize()) {
-            throw new IllegalArgumentException(
-                    "Page must be zero or greater and size must be between 1 and "
-                            + paginationProperties.getMaxPageSize());
-        }
+        validatePage(page, size);
 
         Page<ProductEntity> productPage = productRepository.findAll(PageRequest.of(page, size));
         log.info("Fetched products page={}, size={}, totalRecords={}",
@@ -55,6 +81,8 @@ public class ProductServiceImpl implements ProductService {
                 .page(productPage.getNumber())
                 .pageSize(productPage.getSize())
                 .totalPages(productPage.getTotalPages())
+                .first(productPage.isFirst())
+                .last(productPage.isLast())
                 .build();
     }
 
