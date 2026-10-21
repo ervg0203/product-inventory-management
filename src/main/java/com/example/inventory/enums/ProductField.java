@@ -1,5 +1,6 @@
 package com.example.inventory.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -22,4 +23,18 @@ public enum ProductField {
 
     private final String value;
     private final String label;
+
+    @JsonCreator
+    public static ProductField fromValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        for (ProductField field : values()) {
+            if (field.name().equalsIgnoreCase(value.trim())
+                    || field.value.equalsIgnoreCase(value.trim())) {
+                return field;
+            }
+        }
+        throw new IllegalArgumentException("Unsupported product field: " + value);
+    }
 }
