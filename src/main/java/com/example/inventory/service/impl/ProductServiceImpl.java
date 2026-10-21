@@ -20,7 +20,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import com.example.inventory.dto.request.ProductSearchRequestDTO;
 import com.example.inventory.util.SearchQueryBuilder;
+import com.example.inventory.enums.SortDirection;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,6 +49,77 @@ public class ProductServiceImpl implements ProductService {
         validatePage(page, size);
 
         Query query = searchQueryBuilder.build(request);
+        long total = mongoTemplate.count(Query.of(query), ProductEntity.class);
+        query.skip((long) page * size).limit(size);
+        List<ProductResponseDTO> content = mongoTemplate.find(query, ProductEntity.class).stream()
+                .map(productMapper::toResponseDTO).toList();
+        int totalPages = (int) Math.ceil((double) total / size);
+        return PageResponseDTO.<ProductResponseDTO>builder().content(content).totalRecords(total)
+                .page(page).pageSize(size).totalPages(totalPages)
+                .first(page == 0).last(totalPages == 0 || page >= totalPages - 1).build();
+    }
+
+    @Override
+    public PageResponseDTO<ProductResponseDTO> searchProductsByKeyword(String query, int page, int size) {
+        if (query == null || query.isBlank()) {
+            throw new IllegalArgumentException("Search query cannot be blank");
+        }
+        if (page < 0 || size < 1 || size > 100) {
+            throw new IllegalArgumentException("Page must be zero or greater and size must be between 1 and 100");
+        }
+
+        Query searchQuery = searchQueryBuilder.buildKeywordQuery(query.trim());
+        long total = mongoTemplate.count(Query.of(searchQuery), ProductEntity.class);
+        searchQuery.skip((long) page * size).limit(size);
+        List<ProductResponseDTO> content = mongoTemplate.find(searchQuery, ProductEntity.class).stream()
+                .map(productMapper::toResponseDTO)
+                .toList();
+        int totalPages = (int) Math.ceil((double) total / size);
+
+        return PageResponseDTO.<ProductResponseDTO>builder()
+                .content(content)
+                .totalRecords(total)
+                .page(page)
+                .pageSize(size)
+                .totalPages(totalPages)
+                .first(page == 0)
+                .last(totalPages == 0 || page >= totalPages - 1)
+                .build();
+    }
+
+    @Override
+    public PageResponseDTO<ProductResponseDTO> searchProducts(String query, BigDecimal minPrice,
+                                                              BigDecimal maxPrice, BigDecimal minRating,
+                                                              BigDecimal maxRating, String category, String brand,
+                                                              int page, int size, String sortBy,
+                                                              SortDirection sortDirection) {
+        validateStandardSearch(page, size, minPrice, maxPrice, minRating, maxRating);
+        Query searchQuery = searchQueryBuilder.buildStandardQuery(
+                query, minPrice, maxPrice, minRating, maxRating, category, brand, sortBy, sortDirection);
+        return executeSearch(searchQuery, page, size);
+    }
+
+    private void validateStandardSearch(int page, int size, BigDecimal minPrice, BigDecimal maxPrice,
+                                        BigDecimal minRating, BigDecimal maxRating) {
+        if (page < 0 || size < 1 || size > 100) {
+            throw new IllegalArgumentException("Page must be zero or greater and size must be between 1 and 100");
+        }
+        if (minPrice != null && minPrice.signum() < 0 || maxPrice != null && maxPrice.signum() < 0) {
+            throw new IllegalArgumentException("Price values must be non-negative");
+        }
+        if (minRating != null && (minRating.signum() < 0 || minRating.compareTo(BigDecimal.valueOf(5)) > 0)
+                || maxRating != null && (maxRating.signum() < 0 || maxRating.compareTo(BigDecimal.valueOf(5)) > 0)) {
+            throw new IllegalArgumentException("Rating values must be between 0 and 5");
+        }
+        if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+            throw new IllegalArgumentException("minPrice cannot exceed maxPrice");
+        }
+        if (minRating != null && maxRating != null && minRating.compareTo(maxRating) > 0) {
+            throw new IllegalArgumentException("minRating cannot exceed maxRating");
+        }
+    }
+
+    private PageResponseDTO<ProductResponseDTO> executeSearch(Query query, int page, int size) {
         long total = mongoTemplate.count(Query.of(query), ProductEntity.class);
         query.skip((long) page * size).limit(size);
         List<ProductResponseDTO> content = mongoTemplate.find(query, ProductEntity.class).stream()

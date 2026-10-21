@@ -20,6 +20,9 @@ import java.util.regex.Pattern;
 @Component
 public class SearchQueryBuilder {
 
+    private static final List<String> KEYWORD_FIELDS = List.of(
+            "title", "description", "sku", "brand", "category");
+
     public Query build(ProductSearchRequestDTO request) {
         Query query = new Query();
         if (request.getFilters() != null) {
@@ -28,6 +31,63 @@ public class SearchQueryBuilder {
         if (request.getSortBy() != null && !request.getSortBy().isBlank()) {
             ProductField field = searchFieldFor(request.getSortBy());
             Sort.Direction direction = request.getSortDirection() == SortDirection.DESC
+                    ? Sort.Direction.DESC : Sort.Direction.ASC;
+            query.with(Sort.by(direction, field.getValue()));
+        }
+        return query;
+    }
+
+    public Query buildKeywordQuery(String keyword) {
+        String escapedKeyword = Pattern.quote(keyword);
+        Criteria[] criteria = KEYWORD_FIELDS.stream()
+                .map(field -> Criteria.where(field).regex(escapedKeyword, "i"))
+                .toArray(Criteria[]::new);
+        return new Query(new Criteria().orOperator(criteria));
+    }
+
+    public Query buildStandardQuery(String keyword, BigDecimal minPrice, BigDecimal maxPrice,
+                                    BigDecimal minRating, BigDecimal maxRating,
+                                    String category, String brand, String sortBy,
+                                    SortDirection sortDirection) {
+        Query query = new Query();
+        List<Criteria> criteria = new java.util.ArrayList<>();
+
+        if (keyword != null && !keyword.isBlank()) {
+            criteria.add(new Criteria().orOperator(KEYWORD_FIELDS.stream()
+                    .map(field -> Criteria.where(field).regex(Pattern.quote(keyword.trim()), "i"))
+                    .toArray(Criteria[]::new)));
+        }
+        if (minPrice != null || maxPrice != null) {
+            Criteria priceCriteria = Criteria.where("price");
+            if (minPrice != null) {
+                priceCriteria.gte(minPrice);
+            }
+            if (maxPrice != null) {
+                priceCriteria.lte(maxPrice);
+            }
+            criteria.add(priceCriteria);
+        }
+        if (minRating != null || maxRating != null) {
+            Criteria ratingCriteria = Criteria.where("rating");
+            if (minRating != null) {
+                ratingCriteria.gte(minRating);
+            }
+            if (maxRating != null) {
+                ratingCriteria.lte(maxRating);
+            }
+            criteria.add(ratingCriteria);
+        }
+        if (category != null && !category.isBlank()) {
+            criteria.add(Criteria.where("category").is(category.trim()));
+        }
+        if (brand != null && !brand.isBlank()) {
+            criteria.add(Criteria.where("brand").is(brand.trim()));
+        }
+        criteria.forEach(query::addCriteria);
+
+        if (sortBy != null && !sortBy.isBlank()) {
+            ProductField field = searchFieldFor(sortBy.trim());
+            Sort.Direction direction = sortDirection == SortDirection.DESC
                     ? Sort.Direction.DESC : Sort.Direction.ASC;
             query.with(Sort.by(direction, field.getValue()));
         }

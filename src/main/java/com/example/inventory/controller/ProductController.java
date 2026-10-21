@@ -8,6 +8,7 @@ import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.service.ProductService;
 import com.example.inventory.config.PaginationProperties;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.math.BigDecimal;
+import com.example.inventory.enums.SortDirection;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -57,6 +60,44 @@ public class ProductController {
             @RequestBody ProductSearchRequestDTO request) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products searched successfully",
                 productService.searchProducts(request)));
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search and filter products",
+            description = "Searches products using optional keyword, price, rating, category, brand, sorting, and pagination filters. "
+                    + "All supplied filters use AND semantics; keyword matching across text fields uses OR semantics.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Products searched successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid numeric filter, pagination, sorting field, or sort direction."),
+            @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable.")
+    })
+    public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> searchProductsByKeyword(
+            @Parameter(description = "Optional case-insensitive partial keyword for title, description, SKU, brand, or category.",
+                    example = "phone")
+            @RequestParam(required = false) String query,
+            @Parameter(description = "Minimum inclusive product price.", example = "100.00")
+            @RequestParam(required = false) BigDecimal minPrice,
+            @Parameter(description = "Maximum inclusive product price.", example = "1000.00")
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @Parameter(description = "Minimum inclusive product rating from 0 to 5.", example = "3.5")
+            @RequestParam(required = false) BigDecimal minRating,
+            @Parameter(description = "Maximum inclusive product rating from 0 to 5.", example = "5")
+            @RequestParam(required = false) BigDecimal maxRating,
+            @Parameter(description = "Exact product category match.", example = "smartphones")
+            @RequestParam(required = false) String category,
+            @Parameter(description = "Exact product brand match.", example = "Acme")
+            @RequestParam(required = false) String brand,
+            @Parameter(description = "Zero-based page number.", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size, from 1 to 100.", example = "10")
+            @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Approved product field used for sorting.", example = "price")
+            @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Sort direction. Defaults to ASC when sortBy is supplied.", example = "ASC")
+            @RequestParam(required = false) SortDirection sortDirection) {
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products searched successfully",
+                productService.searchProducts(query, minPrice, maxPrice, minRating, maxRating,
+                        category, brand, page, size, sortBy, sortDirection)));
     }
 
     @GetMapping("/{id}")

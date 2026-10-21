@@ -12,6 +12,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -89,6 +90,14 @@ public class GlobalExceptionHandler {
         log.info("Malformed request received: {}", exception.getMessage());
         return ResponseEntity.badRequest()
                 .body(new ApiResponseDTO<>(false, "Request is malformed or contains invalid parameters", null));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiResponseDTO<Void>> handleArgumentTypeMismatch(
+            MethodArgumentTypeMismatchException exception) {
+        log.info("Invalid request parameter {}: {}", exception.getName(), exception.getValue());
+        return ResponseEntity.badRequest()
+                .body(new ApiResponseDTO<>(false, "Request contains an invalid parameter value", null));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
