@@ -1,6 +1,8 @@
 package com.example.inventory.service.impl;
 
 import com.example.inventory.dto.request.WarehouseRequestDTO;
+import com.example.inventory.dto.common.SearchRequestDTO;
+import com.example.inventory.enums.WarehouseField;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.config.PaginationProperties;
 import com.example.inventory.config.ImportProperties;
@@ -17,6 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import com.example.inventory.util.SearchQueryBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -37,17 +42,35 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseValidator warehouseValidator;
     private final PaginationProperties paginationProperties;
     private final ImportProperties importProperties;
+    private final MongoTemplate mongoTemplate;
+    private final SearchQueryBuilder searchQueryBuilder;
+
+    @Override
+    public PageResponseDTO<WarehouseResponseDTO> searchWarehouses(SearchRequestDTO<WarehouseField> request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Search request cannot be null");
+        }
+        int page = request.getPage() == null ? paginationProperties.getDefaultPage() : request.getPage();
+        int size = request.getSize() == null ? paginationProperties.getDefaultPageSize() : request.getSize();
+        validatePage(page, size);
+
+        Query query = searchQueryBuilder.build(request);
+        long total = mongoTemplate.count(Query.of(query), WarehouseEntity.class);
+        query.skip((long) page * size).limit(size);
+        List<WarehouseResponseDTO> content = mongoTemplate.find(query, WarehouseEntity.class).stream()
+                .map(warehouseMapper::toResponseDTO).toList();
+        int totalPages = (int) Math.ceil((double) total / size);
+        return PageResponseDTO.<WarehouseResponseDTO>builder().content(content).totalRecords(total)
+                .page(page).pageSize(size).totalPages(totalPages)
+                .first(page == 0).last(totalPages == 0 || page >= totalPages - 1).build();
+    }
 
     @Override
     /**
      * Returns the result of the get all warehouses operation.
      */
     public PageResponseDTO<WarehouseResponseDTO> getAllWarehouses(int page, int size) {
-        if (page < 0 || size < 1 || size > paginationProperties.getMaxPageSize()) {
-            throw new IllegalArgumentException(
-                    "Page must be zero or greater and size must be between 1 and "
-                            + paginationProperties.getMaxPageSize());
-        }
+        validatePage(page, size);
         Page<WarehouseEntity> warehousePage = warehouseRepository.findAll(PageRequest.of(page, size));
         log.info("Fetched warehouses page={}, size={}, totalRecords={}",
                 page, size, warehousePage.getTotalElements());
@@ -58,6 +81,13 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .pageSize(warehousePage.getSize())
                 .totalPages(warehousePage.getTotalPages())
                 .build();
+    }
+
+    private void validatePage(int page, int size) {
+        if (page < 0 || size < 1 || size > paginationProperties.getMaxPageSize()) {
+            throw new IllegalArgumentException("Page must be zero or greater and size must be between 1 and "
+                    + paginationProperties.getMaxPageSize());
+        }
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.example.inventory.dto.request;
+package com.example.inventory.dto.common;
 
 import com.example.inventory.enums.SortDirection;
 import lombok.AllArgsConstructor;
@@ -14,8 +14,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductSearchRequestDTO {
-    private List<ProductFilterDTO> filters;
+public class SearchRequestDTO<F> {
+    private List<FilterDTO<F>> filters;
     private Integer page;
     private Integer size;
     private String sortBy;

@@ -19,7 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import com.example.inventory.dto.request.ProductSearchRequestDTO;
+import com.example.inventory.dto.common.SearchRequestDTO;
+import com.example.inventory.enums.ProductField;
 import com.example.inventory.util.SearchQueryBuilder;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Returns the result of the search products operation.
      */
-    public PageResponseDTO<ProductResponseDTO> searchProducts(ProductSearchRequestDTO request) {
+    public PageResponseDTO<ProductResponseDTO> searchProducts(SearchRequestDTO<ProductField> request) {
         if (request == null) throw new IllegalArgumentException("Search request cannot be null");
         int page = request.getPage() == null ? paginationProperties.getDefaultPage() : request.getPage();
         int size = request.getSize() == null ? paginationProperties.getDefaultPageSize() : request.getSize();

@@ -1,5 +1,6 @@
 package com.example.inventory.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -15,8 +16,23 @@ public enum WarehouseField {
     ADDRESS("address", "Address"),
     CITY("city", "City"),
     STATE("state", "State"),
-    POSTAL_CODE("postalCode", "Postal code");
+    POSTAL_CODE("postalCode", "Postal code"),
+    ACTIVE("active", "Active");
 
     private final String value;
     private final String label;
+
+    @JsonCreator
+    public static WarehouseField fromValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        for (WarehouseField field : values()) {
+            if (field.name().equalsIgnoreCase(value.trim())
+                    || field.value.equalsIgnoreCase(value.trim())) {
+                return field;
+            }
+        }
+        throw new IllegalArgumentException("Unsupported warehouse field: " + value);
+    }
 }

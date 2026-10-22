@@ -1,10 +1,11 @@
 package com.example.inventory.util;
 
-import com.example.inventory.dto.request.ProductFilterDTO;
-import com.example.inventory.dto.request.ProductSearchRequestDTO;
+import com.example.inventory.dto.common.FilterDTO;
+import com.example.inventory.dto.common.SearchRequestDTO;
 import com.example.inventory.enums.ProductField;
 import com.example.inventory.enums.SearchOperator;
 import com.example.inventory.enums.SortDirection;
+import com.example.inventory.enums.WarehouseField;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -26,38 +27,54 @@ public class SearchQueryBuilder {
     /**
      * Returns the result of the build operation.
      */
-    public Query build(ProductSearchRequestDTO request) {
+    public <F> Query build(SearchRequestDTO<F> request) {
         Query query = new Query();
         if (request.getFilters() != null) {
             request.getFilters().forEach(filter -> query.addCriteria(toCriteria(filter)));
         }
         if (request.getSortBy() != null && !request.getSortBy().isBlank()) {
-            ProductField field = searchFieldFor(request.getSortBy());
+            String field = searchFieldFor(request.getSortBy(), request.getFilters());
             Sort.Direction direction = request.getSortDirection() == SortDirection.DESC
                     ? Sort.Direction.DESC : Sort.Direction.ASC;
-            query.with(Sort.by(direction, field.getValue()));
+            query.with(Sort.by(direction, field));
         }
         return query;
     }
 
-    private ProductField searchFieldFor(String value) {
+    private <F> String searchFieldFor(String value, List<FilterDTO<F>> filters) {
+        boolean warehouseSearch = filters != null && filters.stream()
+                .anyMatch(filter -> filter != null && filter.getField() instanceof WarehouseField);
+        if (warehouseSearch) {
+            return warehouseSearchFieldFor(value).getValue();
+        }
         for (ProductField field : ProductField.values()) {
             if (isRestricted(field)) {
                 continue;
             }
             if (field.getValue().equals(value) || field.name().equalsIgnoreCase(value)) {
-                return field;
+                return field.getValue();
             }
         }
-        throw new IllegalArgumentException("Unsupported product search or sort field: " + value);
+        return warehouseSearchFieldFor(value).getValue();
     }
 
-    private Criteria toCriteria(ProductFilterDTO filter) {
+    private Criteria toCriteria(FilterDTO<?> filter) {
+        if (filter != null && filter.getField() instanceof WarehouseField) {
+            return toWarehouseCriteria(filter);
+        }
+        return toProductCriteria(filter);
+    }
+
+    private Criteria toProductCriteria(FilterDTO<?> filter) {
         if (filter == null || filter.getField() == null || filter.getOperator() == null
                 || filter.getValue() == null) {
             throw new IllegalArgumentException("Each filter requires field, operator and value");
         }
-        ProductField field = filter.getField();
+
+        if (!(filter.getField() instanceof ProductField)) {
+            throw new IllegalArgumentException("Unsupported product filter field");
+        }
+        ProductField field = (ProductField) filter.getField();
         if (isRestricted(field)) {
             throw new IllegalArgumentException("Unsupported product filter field: " + field.getValue());
         }
@@ -122,6 +139,90 @@ public class SearchQueryBuilder {
             case LESS_THAN_OR_EQUAL -> criteria.lte(converted);
             default -> throw new IllegalArgumentException("Unsupported operator");
         };
+    }
+
+    private WarehouseField warehouseSearchFieldFor(String value) {
+        for (WarehouseField field : WarehouseField.values()) {
+            if (field != WarehouseField.ID
+                    && (field.getValue().equals(value) || field.name().equalsIgnoreCase(value))) {
+                return field;
+            }
+        }
+        throw new IllegalArgumentException("Unsupported warehouse search or sort field: " + value);
+    }
+
+    private Criteria toWarehouseCriteria(FilterDTO<?> filter) {
+        if (filter == null || filter.getField() == null || filter.getOperator() == null
+                || filter.getValue() == null) {
+            throw new IllegalArgumentException("Each filter requires field, operator and value");
+        }
+        if (!(filter.getField() instanceof WarehouseField)) {
+            throw new IllegalArgumentException("Unsupported warehouse filter field");
+        }
+        WarehouseField field = (WarehouseField) filter.getField();
+        if (field == WarehouseField.ID) {
+            throw new IllegalArgumentException("Unsupported warehouse filter field: " + field.getValue());
+        }
+        SearchOperator operator = filter.getOperator();
+        Class<?> type = field == WarehouseField.ACTIVE ? Boolean.class : String.class;
+        Object value = filter.getValue();
+        if (value instanceof String text && text.isBlank()) {
+            throw new IllegalArgumentException("Filter value cannot be blank");
+        }
+        if ((operator == SearchOperator.IN || operator == SearchOperator.BETWEEN)
+                && !(value instanceof Collection<?>)) {
+            throw new IllegalArgumentException(operator + " requires an array value");
+        }
+        if (operator == SearchOperator.BETWEEN) {
+            throw new IllegalArgumentException("BETWEEN is only compatible with numeric fields");
+        }
+        if (operator == SearchOperator.IN && ((Collection<?>) value).isEmpty()) {
+            throw new IllegalArgumentException("IN requires at least one value");
+        }
+        if (isTextOperator(operator) && type != String.class && operator != SearchOperator.EQUALS) {
+            throw new IllegalArgumentException(operator + " is only compatible with text fields");
+        }
+
+        Criteria criteria = Criteria.where(field.getValue());
+        if (isTextOperator(operator) && type == String.class) {
+            String text = Pattern.quote(String.valueOf(value));
+            String regex = switch (operator) {
+                case CONTAINS -> ".*" + text + ".*";
+                case STARTS_WITH -> "^" + text;
+                case ENDS_WITH -> text + "$";
+                case EQUALS -> "^" + text + "$";
+                default -> throw new IllegalArgumentException("Unsupported text operator");
+            };
+            return criteria.regex(regex, "i");
+        }
+        if (operator == SearchOperator.NOT_EQUALS && type == String.class) {
+            return criteria.not().regex("^" + Pattern.quote(String.valueOf(value)) + "$", "i");
+        }
+        if (operator == SearchOperator.IN) {
+            return criteria.in(((Collection<?>) value).stream().map(item -> convertWarehouse(item, type)).toList());
+        }
+        Object converted = convertWarehouse(value, type);
+        return switch (operator) {
+            case EQUALS -> criteria.is(converted);
+            case NOT_EQUALS -> criteria.ne(converted);
+            default -> throw new IllegalArgumentException(operator + " is not compatible with this warehouse field");
+        };
+    }
+
+    private Object convertWarehouse(Object value, Class<?> type) {
+        if (type == String.class) {
+            return String.valueOf(value);
+        }
+        if (value instanceof Boolean booleanValue) {
+            return booleanValue;
+        }
+        if ("true".equalsIgnoreCase(String.valueOf(value))) {
+            return true;
+        }
+        if ("false".equalsIgnoreCase(String.valueOf(value))) {
+            return false;
+        }
+        throw new IllegalArgumentException("Invalid boolean value: " + value);
     }
 
     private boolean isRestricted(ProductField field) {

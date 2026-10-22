@@ -2,6 +2,8 @@ package com.example.inventory.controller;
 
 import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.request.WarehouseRequestDTO;
+import com.example.inventory.dto.common.SearchRequestDTO;
+import com.example.inventory.enums.WarehouseField;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.dto.response.WarehouseResponseDTO;
 import com.example.inventory.service.WarehouseService;
@@ -51,6 +53,21 @@ public class WarehouseController {
                 warehouseService.getAllWarehouses(
                         page == null ? paginationProperties.getDefaultPage() : page,
                         size == null ? paginationProperties.getDefaultPageSize() : size)));
+    }
+
+    @PostMapping("/search")
+    @Operation(summary = "Search warehouses",
+            description = "Searches warehouses using allowlisted fields and operators. Filters use AND semantics; "
+                    + "page is zero-based and size is limited to the configured maximum.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Warehouses searched successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid search criteria, pagination, sorting, or value type."),
+            @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable.")
+    })
+    public ResponseEntity<ApiResponseDTO<PageResponseDTO<WarehouseResponseDTO>>> searchWarehouses(
+            @RequestBody SearchRequestDTO<WarehouseField> request) {
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses searched successfully",
+                warehouseService.searchWarehouses(request)));
     }
 
     @GetMapping("/{id}")

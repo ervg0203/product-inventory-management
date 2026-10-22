@@ -1,6 +1,5 @@
-package com.example.inventory.dto.request;
+package com.example.inventory.dto.common;
 
-import com.example.inventory.enums.ProductField;
 import com.example.inventory.enums.SearchOperator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,8 +12,8 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductFilterDTO {
-    private ProductField field;
+public class FilterDTO<F> {
+    private F field;
     private SearchOperator operator;
     private Object value;
 }

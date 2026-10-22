@@ -1,7 +1,8 @@
 package com.example.inventory.controller;
 
 import com.example.inventory.dto.request.ProductRequestDTO;
-import com.example.inventory.dto.request.ProductSearchRequestDTO;
+import com.example.inventory.dto.common.SearchRequestDTO;
+import com.example.inventory.enums.ProductField;
 import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
@@ -66,7 +67,7 @@ public class ProductController {
      * Handles the search products endpoint.
      */
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> searchProducts(
-            @RequestBody ProductSearchRequestDTO request) {
+            @RequestBody SearchRequestDTO<ProductField> request) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products searched successfully",
                 productService.searchProducts(request)));
     }
