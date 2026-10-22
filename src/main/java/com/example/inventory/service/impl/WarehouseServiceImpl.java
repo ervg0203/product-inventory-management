@@ -12,6 +12,7 @@ import com.example.inventory.exception.WarehouseNotFoundException;
 import com.example.inventory.exception.WarehouseValidationException;
 import com.example.inventory.mapper.WarehouseMapper;
 import com.example.inventory.repository.WarehouseRepository;
+import com.example.inventory.repository.InventoryRepository;
 import com.example.inventory.service.WarehouseService;
 import com.example.inventory.util.WarehouseValidator;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 public class WarehouseServiceImpl implements WarehouseService {
 
     private final WarehouseRepository warehouseRepository;
+    private final InventoryRepository inventoryRepository;
     private final WarehouseMapper warehouseMapper;
     private final WarehouseValidator warehouseValidator;
     private final PaginationProperties paginationProperties;
@@ -189,6 +191,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         if (!warehouseRepository.existsById(id)) {
             throw new WarehouseNotFoundException(id);
         }
+        inventoryRepository.deleteByWarehouseId(id);
         warehouseRepository.deleteById(id);
         log.info("Deleted warehouse id={}", id);
     }
@@ -198,6 +201,7 @@ public class WarehouseServiceImpl implements WarehouseService {
      * Performs the delete all warehouses operation.
      */
     public void deleteAllWarehouses() {
+        inventoryRepository.deleteAll();
         warehouseRepository.deleteAll();
         log.info("Deleted all warehouses");
     }

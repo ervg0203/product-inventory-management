@@ -10,6 +10,7 @@ import com.example.inventory.exception.ProductNotFoundException;
 import com.example.inventory.exception.ProductValidationException;
 import com.example.inventory.mapper.ProductMapper;
 import com.example.inventory.repository.ProductRepository;
+import com.example.inventory.repository.InventoryRepository;
 import com.example.inventory.service.ProductService;
 import com.example.inventory.util.ProductValidator;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final InventoryRepository inventoryRepository;
     private final ProductMapper productMapper;
     private final ProductValidator productValidator;
     private final PaginationProperties paginationProperties;
@@ -255,6 +257,7 @@ public class ProductServiceImpl implements ProductService {
         if (!productRepository.existsById(id)) {
             throw new ProductNotFoundException(id);
         }
+        inventoryRepository.deleteByProductId(id);
         productRepository.deleteById(id);
         log.info("Deleted product id={}", id);
     }
@@ -264,6 +267,7 @@ public class ProductServiceImpl implements ProductService {
      * Performs the delete all products operation.
      */
     public void deleteAllProducts() {
+        inventoryRepository.deleteAll();
         productRepository.deleteAll();
         log.info("Deleted all products");
     }

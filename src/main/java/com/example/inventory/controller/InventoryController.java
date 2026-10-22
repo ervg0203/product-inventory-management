@@ -30,7 +30,7 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-    @PostMapping
+    @PostMapping("/create")
     @Operation(summary = "Create inventory", description = "Creates stock for a product in an active warehouse.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Inventory created successfully."),
@@ -143,7 +143,7 @@ public class InventoryController {
                 inventoryService.setStock(inventoryId, request)));
     }
 
-    @PostMapping("/{inventoryId}/stock/increase")
+    @PatchMapping("/{inventoryId}/stock/increase")
     @Operation(summary = "Increase stock",
             description = "Adds the supplied quantity to an inventory record. The warehouse must be active.")
     @ApiResponses({
@@ -164,7 +164,7 @@ public class InventoryController {
                 inventoryService.increaseStock(inventoryId, request)));
     }
 
-    @PostMapping("/{inventoryId}/stock/decrease")
+    @PatchMapping("/{inventoryId}/stock/decrease")
     @Operation(summary = "Decrease stock",
             description = "Removes the supplied quantity atomically. The operation fails if it would produce negative stock.")
     @ApiResponses({
