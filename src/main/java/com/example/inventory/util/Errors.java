@@ -16,6 +16,6 @@ import lombok.Setter;
  */
 public class Errors {
 
-    private String message;
     private String field;
+    private String message;
 }
