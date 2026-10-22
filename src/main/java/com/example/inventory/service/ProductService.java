@@ -26,6 +26,7 @@ public interface ProductService {
     List<ProductResponseDTO> importProducts(List<ProductRequestDTO> products);
 
     void deleteProduct(String id);
+    void deleteProductsByFilters(SearchRequestDTO<ProductField> request);
 
     void deleteAllProducts();
 }

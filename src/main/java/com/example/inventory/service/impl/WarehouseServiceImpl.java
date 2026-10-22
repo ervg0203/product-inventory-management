@@ -197,6 +197,21 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    public void deleteWarehousesByFilters(SearchRequestDTO<WarehouseField> request) {
+        if (request == null || request.getFilters() == null || request.getFilters().isEmpty()) {
+            throw new IllegalArgumentException("At least one filter is required");
+        }
+        List<String> ids = mongoTemplate.find(searchQueryBuilder.build(request), WarehouseEntity.class)
+                .stream().map(WarehouseEntity::getId).toList();
+        if (ids.isEmpty()) {
+            return;
+        }
+        inventoryRepository.deleteByWarehouseIdIn(ids);
+        warehouseRepository.deleteAllById(ids);
+        log.info("Deleted {} warehouses matching filters", ids.size());
+    }
+
+    @Override
     /**
      * Performs the delete all warehouses operation.
      */

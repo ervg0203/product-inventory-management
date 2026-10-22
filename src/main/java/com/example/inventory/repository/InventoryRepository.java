@@ -8,8 +8,10 @@ public interface InventoryRepository extends MongoRepository<InventoryEntity, St
     Optional<InventoryEntity> findByProductIdAndWarehouseId(String productId, String warehouseId);
     List<InventoryEntity> findByProductId(String productId);
     void deleteByProductId(String productId);
+    void deleteByProductIdIn(Iterable<String> productIds);
     List<InventoryEntity> findByWarehouseId(String warehouseId);
     void deleteByWarehouseId(String warehouseId);
+    void deleteByWarehouseIdIn(Iterable<String> warehouseIds);
     List<InventoryEntity> findByQuantityLessThanEqual(Integer threshold);
     List<InventoryEntity> findByWarehouseIdAndQuantityLessThanEqual(String warehouseId, Integer threshold);
 }

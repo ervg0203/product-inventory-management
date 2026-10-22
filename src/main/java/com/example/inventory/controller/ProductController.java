@@ -207,6 +207,16 @@ public class ProductController {
                 "All products deleted successfully", null));
     }
 
+    @DeleteMapping("/delete-by-filters")
+    @Operation(summary = "Delete products by filters",
+            description = "Deletes all products matching the supplied search filters and their related inventory records.")
+    public ResponseEntity<ApiResponseDTO<Void>> deleteProductsByFilters(
+            @RequestBody SearchRequestDTO<ProductField> request) {
+        productService.deleteProductsByFilters(request);
+        return ResponseEntity.ok(new ApiResponseDTO<>(true,
+                "Products matching filters deleted successfully", null));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a product",
             description = "Permanently removes one product from the catalog using its unique identifier.")

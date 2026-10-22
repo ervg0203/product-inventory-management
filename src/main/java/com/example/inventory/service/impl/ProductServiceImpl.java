@@ -263,6 +263,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public void deleteProductsByFilters(SearchRequestDTO<ProductField> request) {
+        validateDeleteRequest(request);
+        List<String> ids = mongoTemplate.find(searchQueryBuilder.build(request), ProductEntity.class)
+                .stream().map(ProductEntity::getId).toList();
+        if (ids.isEmpty()) {
+            return;
+        }
+        inventoryRepository.deleteByProductIdIn(ids);
+        productRepository.deleteAllById(ids);
+        log.info("Deleted {} products matching filters", ids.size());
+    }
+
+    @Override
     /**
      * Performs the delete all products operation.
      */
@@ -270,5 +283,11 @@ public class ProductServiceImpl implements ProductService {
         inventoryRepository.deleteAll();
         productRepository.deleteAll();
         log.info("Deleted all products");
+    }
+
+    private void validateDeleteRequest(SearchRequestDTO<ProductField> request) {
+        if (request == null || request.getFilters() == null || request.getFilters().isEmpty()) {
+            throw new IllegalArgumentException("At least one filter is required");
+        }
     }
 }

@@ -18,5 +18,6 @@ public interface WarehouseService {
     List<WarehouseResponseDTO> updateWarehouses(List<WarehouseRequestDTO> requests);
     List<WarehouseResponseDTO> importWarehouses(List<WarehouseRequestDTO> warehouses);
     void deleteWarehouse(String id);
+    void deleteWarehousesByFilters(SearchRequestDTO<WarehouseField> request);
     void deleteAllWarehouses();
 }

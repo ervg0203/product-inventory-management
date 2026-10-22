@@ -203,6 +203,16 @@ public class WarehouseController {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "All warehouses deleted successfully", null));
     }
 
+    @DeleteMapping("/delete-by-filters")
+    @Operation(summary = "Delete warehouses by filters",
+            description = "Deletes all warehouses matching the supplied search filters and their related inventory records.")
+    public ResponseEntity<ApiResponseDTO<Void>> deleteWarehousesByFilters(
+            @RequestBody SearchRequestDTO<WarehouseField> request) {
+        warehouseService.deleteWarehousesByFilters(request);
+        return ResponseEntity.ok(new ApiResponseDTO<>(true,
+                "Warehouses matching filters deleted successfully", null));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a warehouse",
             description = "Permanently removes one warehouse using its unique identifier.")
