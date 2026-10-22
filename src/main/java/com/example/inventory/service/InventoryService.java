@@ -11,6 +11,8 @@ import java.util.List;
 public interface InventoryService {
 
     InventoryResponseDTO createInventory(InventoryRequestDTO request);
+    List<InventoryResponseDTO> createInventories(List<InventoryRequestDTO> requests);
+    List<InventoryResponseDTO> updateInventories(List<InventoryRequestDTO> requests);
 
     InventoryResponseDTO getInventoryById(String inventoryId);
 

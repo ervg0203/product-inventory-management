@@ -4,6 +4,7 @@ import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.common.ValidationErrorResponseDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.response.WarehouseResponseDTO;
+import com.example.inventory.dto.response.InventoryResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -53,6 +54,13 @@ public class GlobalExceptionHandler {
                                 .totalIncorrectDtos(exception.getTotalIncorrectDtos())
                                 .incorrectDtos(exception.getWarehouses())
                                 .build()));
+    }
+
+    @ExceptionHandler(InventoryValidationException.class)
+    public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> handleInventoryValidation(
+            InventoryValidationException exception) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(new ApiResponseDTO<>(false, exception.getMessage(), exception.getInventories()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

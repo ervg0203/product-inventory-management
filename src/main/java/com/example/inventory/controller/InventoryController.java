@@ -50,6 +50,25 @@ public class InventoryController {
                         inventoryService.createInventory(request)));
     }
 
+    @PostMapping("/create-multi")
+    @Operation(summary = "Create inventory in bulk",
+            description = "Creates multiple inventory records after validating the complete request.")
+    public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> createInventories(
+            @RequestBody List<InventoryRequestDTO> requests) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponseDTO<>(true, "Inventory records created successfully",
+                        inventoryService.createInventories(requests)));
+    }
+
+    @PutMapping("/update-multi")
+    @Operation(summary = "Update inventory in bulk",
+            description = "Updates multiple inventory records using their IDs.")
+    public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> updateInventories(
+            @RequestBody List<InventoryRequestDTO> requests) {
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Inventory records updated successfully",
+                inventoryService.updateInventories(requests)));
+    }
+
     @GetMapping("/{inventoryId}")
     @Operation(summary = "Get inventory", description = "Returns one inventory record by its ID.")
     @ApiResponses({

@@ -10,6 +10,7 @@ import com.example.inventory.entity.WarehouseEntity;
 import com.example.inventory.exception.InsufficientStockException;
 import com.example.inventory.exception.InventoryConflictException;
 import com.example.inventory.exception.InventoryNotFoundException;
+import com.example.inventory.exception.InventoryValidationException;
 import com.example.inventory.exception.ProductNotFoundException;
 import com.example.inventory.exception.WarehouseNotFoundException;
 import com.example.inventory.mapper.InventoryMapper;
@@ -28,6 +29,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +70,46 @@ public class InventoryServiceImpl implements InventoryService {
         } catch (DuplicateKeyException exception) {
             throw new InventoryConflictException("Inventory already exists for this product and warehouse");
         }
+    }
+
+    @Override
+    public List<InventoryResponseDTO> createInventories(List<InventoryRequestDTO> requests) {
+        validateRequests(requests);
+        requests.forEach(this::validateCreateRequest);
+        throwIfInvalid(requests);
+
+        LocalDateTime now = LocalDateTime.now();
+        List<InventoryEntity> entities = requests.stream().map(request -> {
+            InventoryEntity entity = inventoryMapper.toEntity(request);
+            entity.setCreatedAt(now);
+            entity.setUpdatedAt(now);
+            return entity;
+        }).toList();
+        return inventoryRepository.saveAll(entities).stream()
+                .map(inventoryMapper::toResponseDTO).toList();
+    }
+
+    @Override
+    public List<InventoryResponseDTO> updateInventories(List<InventoryRequestDTO> requests) {
+        validateRequests(requests);
+        Set<String> ids = requests.stream().map(InventoryRequestDTO::getId)
+                .filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, InventoryEntity> existing = inventoryRepository.findAllById(ids).stream()
+                .collect(Collectors.toMap(InventoryEntity::getId, entity -> entity));
+
+        requests.forEach(request -> validateUpdateRequest(request, existing));
+        throwIfInvalid(requests);
+
+        requests.forEach(request -> {
+            InventoryEntity entity = existing.get(request.getId());
+            entity.setProductId(request.getProductId());
+            entity.setWarehouseId(request.getWarehouseId());
+            entity.setQuantity(request.getQuantity());
+            entity.setUpdatedAt(LocalDateTime.now());
+        });
+        return inventoryRepository.saveAll(requests.stream()
+                        .map(request -> existing.get(request.getId())).toList())
+                .stream().map(inventoryMapper::toResponseDTO).toList();
     }
 
     @Override
@@ -194,6 +240,77 @@ public class InventoryServiceImpl implements InventoryService {
     private InventoryEntity requireInventory(String inventoryId) {
         return inventoryRepository.findById(inventoryId)
                 .orElseThrow(() -> new InventoryNotFoundException(inventoryId));
+    }
+
+    private void validateRequests(List<InventoryRequestDTO> requests) {
+        if (requests == null || requests.isEmpty()) {
+            throw new IllegalArgumentException("At least one inventory record is required");
+        }
+        if (requests.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("Inventory entries cannot be null");
+        }
+        requests.forEach(request -> {
+            request.setErrors(new ArrayList<>());
+            request.setIsValid(true);
+        });
+    }
+
+    private void validateCreateRequest(InventoryRequestDTO request) {
+        validateFields(request);
+        if (isValid(request) && inventoryRepository.findByProductIdAndWarehouseId(
+                request.getProductId(), request.getWarehouseId()).isPresent()) {
+            addError(request, "productId",
+                    "Inventory already exists for this product and warehouse");
+        }
+    }
+
+    private void validateUpdateRequest(InventoryRequestDTO request,
+                                       Map<String, InventoryEntity> existing) {
+        validateFields(request);
+        if (request.getId() == null || request.getId().isBlank()) {
+            addError(request, "id", "Inventory ID is required for update");
+        } else if (!existing.containsKey(request.getId())) {
+            addError(request, "id", "Inventory ID does not exist");
+        }
+    }
+
+    private void validateFields(InventoryRequestDTO request) {
+        if (request.getProductId() == null || request.getProductId().isBlank()) {
+            addError(request, "productId", "Product ID is required");
+        } else if (!productRepository.existsById(request.getProductId())) {
+            addError(request, "productId", "Product does not exist");
+        }
+        if (request.getWarehouseId() == null || request.getWarehouseId().isBlank()) {
+            addError(request, "warehouseId", "Warehouse ID is required");
+        } else {
+            try {
+                requireActiveWarehouse(request.getWarehouseId());
+            } catch (RuntimeException exception) {
+                addError(request, "warehouseId", exception.getMessage());
+            }
+        }
+        if (request.getQuantity() == null || request.getQuantity() < 0) {
+            addError(request, "quantity", "Quantity must be zero or greater");
+        }
+    }
+
+    private boolean isValid(InventoryRequestDTO request) {
+        return Boolean.TRUE.equals(request.getIsValid());
+    }
+
+    private void addError(InventoryRequestDTO request, String field, String message) {
+        request.setIsValid(false);
+        request.getErrors().add(com.example.inventory.util.Errors.builder()
+                .field(field).message(message).build());
+    }
+
+    private void throwIfInvalid(List<InventoryRequestDTO> requests) {
+        List<InventoryResponseDTO> invalid = requests.stream()
+                .filter(request -> !Boolean.TRUE.equals(request.getIsValid()))
+                .map(inventoryMapper::toResponseDTO).toList();
+        if (!invalid.isEmpty()) {
+            throw new InventoryValidationException(invalid);
+        }
     }
 
     private void requireProduct(String productId) {
