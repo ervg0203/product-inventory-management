@@ -136,34 +136,31 @@ public class WarehouseServiceImpl implements WarehouseService {
      */
     public List<WarehouseResponseDTO> updateWarehouses(List<WarehouseRequestDTO> requests) {
         validateRequests(requests);
-        Set<String> ids = requests.stream().map(WarehouseRequestDTO::getId)
+        Set<String> codes = requests.stream().map(WarehouseRequestDTO::getCode)
                 .filter(Objects::nonNull).collect(Collectors.toSet());
-        Map<String, WarehouseEntity> existing = warehouseRepository.findAllById(ids).stream()
-                .collect(Collectors.toMap(WarehouseEntity::getId, warehouse -> warehouse));
+        Map<String, WarehouseEntity> existing = warehouseRepository.findAllByCodeIn(codes).stream()
+                .collect(Collectors.toMap(WarehouseEntity::getCode, warehouse -> warehouse));
         requests.forEach(request -> warehouseValidator.validateForUpdate(request, existing.keySet()));
         throwIfInvalid(requests);
-        requests.forEach(request -> warehouseMapper.updateEntity(existing.get(request.getId()), request));
+        requests.forEach(request -> warehouseMapper.updateEntity(existing.get(request.getCode()), request));
         return warehouseRepository.saveAll(requests.stream()
-                        .map(request -> existing.get(request.getId())).toList())
+                        .map(request -> existing.get(request.getCode())).toList())
                 .stream().map(warehouseMapper::toResponseDTO).toList();
     }
 
     @Override
     public List<WarehouseResponseDTO> importWarehouses(List<WarehouseRequestDTO> warehouses) {
         validateRequests(warehouses);
+        Set<String> codes = warehouses.stream().map(WarehouseRequestDTO::getCode)
+                .filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, WarehouseEntity> existing = warehouseRepository.findAllByCodeIn(codes).stream()
+                .collect(Collectors.toMap(WarehouseEntity::getCode, warehouse -> warehouse));
         List<WarehouseRequestDTO> creates = warehouses.stream()
-                .filter(warehouse -> warehouse.getId() == null || warehouse.getId().isBlank())
-                .toList();
+                .filter(warehouse -> !existing.containsKey(warehouse.getCode())).toList();
         List<WarehouseRequestDTO> updates = warehouses.stream()
-                .filter(warehouse -> warehouse.getId() != null && !warehouse.getId().isBlank())
-                .toList();
+                .filter(warehouse -> existing.containsKey(warehouse.getCode())).toList();
 
         creates.forEach(warehouseValidator::validate);
-        Set<String> updateIds = updates.stream()
-                .map(WarehouseRequestDTO::getId)
-                .collect(Collectors.toSet());
-        Map<String, WarehouseEntity> existing = warehouseRepository.findAllById(updateIds).stream()
-                .collect(Collectors.toMap(WarehouseEntity::getId, warehouse -> warehouse));
         updates.forEach(warehouse ->
                 warehouseValidator.validateForUpdate(warehouse, existing.keySet()));
         throwIfInvalid(warehouses);

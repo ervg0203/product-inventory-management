@@ -47,13 +47,13 @@ public final class ProductValidator {
     /**
      * Performs the validate for update operation.
      */
-    public void validateForUpdate(ProductRequestDTO product, Set<String> existingProductIds) {
+    public void validateForUpdate(ProductRequestDTO product, Set<String> existingProductSkus) {
         validate(product);
 
-        if (product.getId() == null || product.getId().isBlank()) {
-            addError(product, ErrorMessage.REQUIRED, ProductField.ID);
-        } else if (existingProductIds == null || !existingProductIds.contains(product.getId())) {
-            addError(product, ErrorMessage.NOT_FOUND, ProductField.ID);
+        if (product.getSku() == null || product.getSku().isBlank()) {
+            addError(product, ErrorMessage.REQUIRED, ProductField.SKU);
+        } else if (existingProductSkus == null || !existingProductSkus.contains(product.getSku())) {
+            addError(product, ErrorMessage.NOT_FOUND, ProductField.SKU);
         }
     }
 

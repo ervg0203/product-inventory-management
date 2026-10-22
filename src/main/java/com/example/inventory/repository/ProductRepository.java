@@ -13,5 +13,6 @@ import java.util.Optional;
 public interface ProductRepository extends MongoRepository<ProductEntity, String> {
 
     Page<ProductEntity> findAll(Pageable pageable);
+    List<ProductEntity> findAllBySkuIn(Iterable<String> skus);
 
 }

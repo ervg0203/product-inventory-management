@@ -34,15 +34,15 @@ public class WarehouseValidator {
     /**
      * Performs the validate for update operation.
      */
-    public void validateForUpdate(WarehouseRequestDTO warehouse, Set<String> existingIds) {
+    public void validateForUpdate(WarehouseRequestDTO warehouse, Set<String> existingCodes) {
         validate(warehouse);
         if (warehouse == null) {
             return;
         }
-        if (warehouse.getId() == null || warehouse.getId().isBlank()) {
-            addError(warehouse, ErrorMessage.REQUIRED, WarehouseField.ID);
-        } else if (existingIds == null || !existingIds.contains(warehouse.getId())) {
-            addError(warehouse, ErrorMessage.NOT_FOUND, WarehouseField.ID);
+        if (warehouse.getCode() == null || warehouse.getCode().isBlank()) {
+            addError(warehouse, ErrorMessage.REQUIRED, WarehouseField.CODE);
+        } else if (existingCodes == null || !existingCodes.contains(warehouse.getCode())) {
+            addError(warehouse, ErrorMessage.NOT_FOUND, WarehouseField.CODE);
         }
     }
 

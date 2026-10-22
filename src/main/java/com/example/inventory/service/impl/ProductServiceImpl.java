@@ -158,25 +158,25 @@ public class ProductServiceImpl implements ProductService {
 
         validateProductRequests(productRequestDTOS);
 
-        Set<String> productIds = productRequestDTOS.stream()
-                .map(ProductRequestDTO::getId)
+        Set<String> productSkus = productRequestDTOS.stream()
+                .map(ProductRequestDTO::getSku)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        Map<String, ProductEntity> existingProducts = productRepository.findAllById(productIds).stream()
-                .collect(Collectors.toMap(ProductEntity::getId, product -> product));
+        Map<String, ProductEntity> existingProducts = productRepository.findAllBySkuIn(productSkus).stream()
+                .collect(Collectors.toMap(ProductEntity::getSku, product -> product));
 
-        Set<String> existingProductIds = existingProducts.keySet();
+        Set<String> existingProductSkus = existingProducts.keySet();
 
         productRequestDTOS.forEach(product ->
-                productValidator.validateForUpdate(product, existingProductIds));
+                productValidator.validateForUpdate(product, existingProductSkus));
         throwIfInvalid(productRequestDTOS);
 
         productRequestDTOS.forEach(product ->
-                productMapper.updateEntity(existingProducts.get(product.getId()), product));
+                productMapper.updateEntity(existingProducts.get(product.getSku()), product));
 
         List<ProductEntity> productEntities = productRequestDTOS.stream()
-                .map(product -> existingProducts.get(product.getId()))
+                .map(product -> existingProducts.get(product.getSku()))
                 .toList();
 
         List<ProductResponseDTO> updatedProducts = productRepository.saveAll(productEntities).stream()
@@ -191,22 +191,16 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponseDTO> importProducts(List<ProductRequestDTO> products) {
         validateProductRequests(products);
 
+        Set<String> skus = products.stream().map(ProductRequestDTO::getSku)
+                .filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, ProductEntity> existingProducts = productRepository.findAllBySkuIn(skus).stream()
+                .collect(Collectors.toMap(ProductEntity::getSku, product -> product));
         List<ProductRequestDTO> creates = products.stream()
-                .filter(product -> product.getId() == null || product.getId().isBlank())
-                .toList();
+                .filter(product -> !existingProducts.containsKey(product.getSku())).toList();
         List<ProductRequestDTO> updates = products.stream()
-                .filter(product -> product.getId() != null && !product.getId().isBlank())
-                .toList();
+                .filter(product -> existingProducts.containsKey(product.getSku())).toList();
 
-        // Validate every row and resolve every update ID before any repository
-        // method is called. This prevents DTO validation errors in a later
-        // group or batch from allowing an earlier group to be saved.
         creates.forEach(productValidator::validate);
-        Set<String> updateIds = updates.stream()
-                .map(ProductRequestDTO::getId)
-                .collect(Collectors.toSet());
-        Map<String, ProductEntity> existingProducts = productRepository.findAllById(updateIds).stream()
-                .collect(Collectors.toMap(ProductEntity::getId, product -> product));
         updates.forEach(product ->
                 productValidator.validateForUpdate(product, existingProducts.keySet()));
         throwIfInvalid(products);
