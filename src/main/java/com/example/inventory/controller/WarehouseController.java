@@ -1,6 +1,7 @@
 package com.example.inventory.controller;
 
 import com.example.inventory.dto.common.ApiResponseDTO;
+import com.example.inventory.dto.common.ImportResponseDTO;
 import com.example.inventory.dto.request.WarehouseRequestDTO;
 import com.example.inventory.dto.common.SearchRequestDTO;
 import com.example.inventory.enums.WarehouseField;
@@ -174,14 +175,14 @@ public class WarehouseController {
     @PostMapping(value = "/import", consumes = "multipart/form-data")
     @Operation(summary = "Import warehouses from Excel",
             description = "Rows with an ID are updated and rows without an ID are created. "
-                    + "All rows are validated before any row is persisted.")
+                    + "All rows are validated before any row is persisted. The response separates saved warehouses into created and updated lists.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Warehouses imported successfully."),
             @ApiResponse(responseCode = "400", description = "The file is empty, malformed, or has unsupported columns."),
             @ApiResponse(responseCode = "422", description = "One or more warehouse rows failed validation."),
             @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable.")
     })
-    public ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> importWarehouses(
+    public ResponseEntity<ApiResponseDTO<ImportResponseDTO<WarehouseResponseDTO>>> importWarehouses(
             @RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses imported successfully",
                 warehouseService.importWarehouses(warehouseExcelParser.parse(file))));

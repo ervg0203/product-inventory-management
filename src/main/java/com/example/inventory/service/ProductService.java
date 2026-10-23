@@ -1,6 +1,7 @@
 package com.example.inventory.service;
 import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
+import com.example.inventory.dto.common.ImportResponseDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.dto.common.SearchRequestDTO;
 import com.example.inventory.enums.ProductField;
@@ -23,7 +24,7 @@ public interface ProductService {
 
     List<ProductResponseDTO> updateProducts(List<ProductRequestDTO> productRequestDTOS);
 
-    List<ProductResponseDTO> importProducts(List<ProductRequestDTO> products);
+    ImportResponseDTO<ProductResponseDTO> importProducts(List<ProductRequestDTO> products);
 
     void deleteProduct(String id);
     void deleteProductsByFilters(SearchRequestDTO<ProductField> request);

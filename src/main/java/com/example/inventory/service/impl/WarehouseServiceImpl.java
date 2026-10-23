@@ -4,6 +4,7 @@ import com.example.inventory.dto.request.WarehouseRequestDTO;
 import com.example.inventory.dto.common.SearchRequestDTO;
 import com.example.inventory.enums.WarehouseField;
 import com.example.inventory.dto.common.PageResponseDTO;
+import com.example.inventory.dto.common.ImportResponseDTO;
 import com.example.inventory.config.PaginationProperties;
 import com.example.inventory.config.ImportProperties;
 import com.example.inventory.dto.response.WarehouseResponseDTO;
@@ -149,7 +150,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public List<WarehouseResponseDTO> importWarehouses(List<WarehouseRequestDTO> warehouses) {
+    public ImportResponseDTO<WarehouseResponseDTO> importWarehouses(List<WarehouseRequestDTO> warehouses) {
         validateRequests(warehouses);
         Set<String> codes = warehouses.stream().map(WarehouseRequestDTO::getCode)
                 .filter(Objects::nonNull).collect(Collectors.toSet());
@@ -168,16 +169,20 @@ public class WarehouseServiceImpl implements WarehouseService {
         if (importProperties.getBatchSize() < 1) {
             throw new IllegalArgumentException("Import batch size must be greater than zero");
         }
-        List<WarehouseResponseDTO> imported = new java.util.ArrayList<>();
+        List<WarehouseResponseDTO> createdWarehouses = new java.util.ArrayList<>();
+        List<WarehouseResponseDTO> updatedWarehouses = new java.util.ArrayList<>();
         for (int start = 0; start < creates.size(); start += importProperties.getBatchSize()) {
             int end = Math.min(start + importProperties.getBatchSize(), creates.size());
-            imported.addAll(createWarehouses(creates.subList(start, end)));
+            createdWarehouses.addAll(createWarehouses(creates.subList(start, end)));
         }
         for (int start = 0; start < updates.size(); start += importProperties.getBatchSize()) {
             int end = Math.min(start + importProperties.getBatchSize(), updates.size());
-            imported.addAll(updateWarehouses(updates.subList(start, end)));
+            updatedWarehouses.addAll(updateWarehouses(updates.subList(start, end)));
         }
-        return imported;
+        return ImportResponseDTO.<WarehouseResponseDTO>builder()
+                .created(createdWarehouses)
+                .updated(updatedWarehouses)
+                .build();
     }
 
     @Override

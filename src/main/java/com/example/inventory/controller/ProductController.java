@@ -4,6 +4,7 @@ import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.common.SearchRequestDTO;
 import com.example.inventory.enums.ProductField;
 import com.example.inventory.dto.common.ApiResponseDTO;
+import com.example.inventory.dto.common.ImportResponseDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.service.ProductService;
@@ -177,14 +178,14 @@ public class ProductController {
     @PostMapping(value = "/import", consumes = "multipart/form-data")
     @Operation(summary = "Import products from Excel",
             description = "Reads product rows from an .xlsx file. Rows with an ID are updated; rows without an ID are created. "
-                    + "All rows are validated before any row is persisted.")
+                    + "All rows are validated before any row is persisted. The response separates saved products into created and updated lists.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Products imported successfully."),
             @ApiResponse(responseCode = "400", description = "The file is empty, malformed, or has unsupported columns/values."),
             @ApiResponse(responseCode = "422", description = "One or more product rows failed validation."),
             @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable.")
     })
-    public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> importProducts(
+    public ResponseEntity<ApiResponseDTO<ImportResponseDTO<ProductResponseDTO>>> importProducts(
             @RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products imported successfully",
                 productService.importProducts(productExcelParser.parse(file))));

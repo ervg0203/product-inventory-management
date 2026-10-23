@@ -2,6 +2,7 @@ package com.example.inventory.service.impl;
 
 import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
+import com.example.inventory.dto.common.ImportResponseDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.config.PaginationProperties;
 import com.example.inventory.config.ImportProperties;
@@ -188,7 +189,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDTO> importProducts(List<ProductRequestDTO> products) {
+    public ImportResponseDTO<ProductResponseDTO> importProducts(List<ProductRequestDTO> products) {
         validateProductRequests(products);
 
         Set<String> skus = products.stream().map(ProductRequestDTO::getSku)
@@ -209,16 +210,20 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Import batch size must be greater than zero");
         }
 
-        List<ProductResponseDTO> imported = new java.util.ArrayList<>();
+        List<ProductResponseDTO> createdProducts = new java.util.ArrayList<>();
+        List<ProductResponseDTO> updatedProducts = new java.util.ArrayList<>();
         for (int start = 0; start < creates.size(); start += importProperties.getBatchSize()) {
             int end = Math.min(start + importProperties.getBatchSize(), creates.size());
-            imported.addAll(createProducts(creates.subList(start, end)));
+            createdProducts.addAll(createProducts(creates.subList(start, end)));
         }
         for (int start = 0; start < updates.size(); start += importProperties.getBatchSize()) {
             int end = Math.min(start + importProperties.getBatchSize(), updates.size());
-            imported.addAll(updateProducts(updates.subList(start, end)));
+            updatedProducts.addAll(updateProducts(updates.subList(start, end)));
         }
-        return imported;
+        return ImportResponseDTO.<ProductResponseDTO>builder()
+                .created(createdProducts)
+                .updated(updatedProducts)
+                .build();
     }
 
     private void validateProductRequests(List<ProductRequestDTO> products) {
