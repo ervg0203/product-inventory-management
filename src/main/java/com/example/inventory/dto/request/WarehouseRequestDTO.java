@@ -1,6 +1,6 @@
 package com.example.inventory.dto.request;
 
-import com.example.inventory.util.Errors;
+import com.example.inventory.dto.common.ErrorsDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,7 +34,7 @@ public class WarehouseRequestDTO {
     private boolean active;
 
     @Builder.Default
-    private List<Errors> errors = new ArrayList<>();
+    private List<ErrorsDTO> errors = new ArrayList<>();
 
     @Builder.Default
     private Boolean isValid = true;

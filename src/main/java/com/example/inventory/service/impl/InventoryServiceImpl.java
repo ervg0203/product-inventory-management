@@ -18,6 +18,7 @@ import com.example.inventory.repository.InventoryRepository;
 import com.example.inventory.repository.ProductRepository;
 import com.example.inventory.repository.WarehouseRepository;
 import com.example.inventory.service.InventoryService;
+import com.example.inventory.dto.common.ErrorsDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
@@ -300,7 +301,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     private void addError(InventoryRequestDTO request, String field, String message) {
         request.setIsValid(false);
-        request.getErrors().add(com.example.inventory.util.Errors.builder()
+        request.getErrors().add(ErrorsDTO.builder()
                 .field(field).message(message).build());
     }
 

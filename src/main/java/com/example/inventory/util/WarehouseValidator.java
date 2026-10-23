@@ -1,5 +1,6 @@
 package com.example.inventory.util;
 
+import com.example.inventory.dto.common.ErrorsDTO;
 import com.example.inventory.dto.request.WarehouseRequestDTO;
 import com.example.inventory.enums.ErrorMessage;
 import com.example.inventory.enums.WarehouseField;
@@ -61,7 +62,7 @@ public class WarehouseValidator {
         Object[] messageArguments = new Object[arguments.length + 1];
         messageArguments[0] = field.getLabel();
         System.arraycopy(arguments, 0, messageArguments, 1, arguments.length);
-        warehouse.getErrors().add(Errors.builder()
+        warehouse.getErrors().add(ErrorsDTO.builder()
                 .message(message.format(messageArguments))
                 .field(field.getValue())
                 .build());

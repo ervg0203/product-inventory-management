@@ -1,6 +1,6 @@
 package com.example.inventory.dto.response;
 
-import com.example.inventory.util.Errors;
+import com.example.inventory.dto.common.ErrorsDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +22,6 @@ public class InventoryResponseDTO {
     private Integer quantity;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<Errors> errors;
+    private List<ErrorsDTO> errors;
     private boolean isValid;
 }

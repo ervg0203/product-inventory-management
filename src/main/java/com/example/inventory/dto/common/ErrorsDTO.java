@@ -1,4 +1,4 @@
-package com.example.inventory.util;
+package com.example.inventory.dto.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import lombok.Setter;
 /**
  * Provides the errors component.
  */
-public class Errors {
+public class ErrorsDTO {
 
     private String field;
     private String message;
