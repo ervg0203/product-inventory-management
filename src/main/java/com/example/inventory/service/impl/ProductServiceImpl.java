@@ -22,8 +22,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import com.example.inventory.dto.common.SearchRequestDTO;
+import com.example.inventory.dto.common.ProductSearchQueryDTO;
 import com.example.inventory.enums.ProductField;
 import com.example.inventory.util.SearchQueryBuilder;
+import com.example.inventory.util.SearchCriteriaBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,7 @@ public class ProductServiceImpl implements ProductService {
     private final PaginationProperties paginationProperties;
     private final MongoTemplate mongoTemplate;
     private final SearchQueryBuilder searchQueryBuilder;
+    private final SearchCriteriaBuilder searchCriteriaBuilder;
     private final ImportProperties importProperties;
 
     @Override
@@ -59,6 +62,23 @@ public class ProductServiceImpl implements ProductService {
         validatePage(page, size);
 
         Query query = searchQueryBuilder.build(request);
+        long total = mongoTemplate.count(Query.of(query), ProductEntity.class);
+        query.skip((long) page * size).limit(size);
+        List<ProductResponseDTO> content = mongoTemplate.find(query, ProductEntity.class).stream()
+                .map(productMapper::toResponseDTO).toList();
+        int totalPages = (int) Math.ceil((double) total / size);
+        return PageResponseDTO.<ProductResponseDTO>builder().content(content).totalRecords(total)
+                .page(page).pageSize(size).totalPages(totalPages)
+                .first(page == 0).last(totalPages == 0 || page >= totalPages - 1).build();
+    }
+
+    @Override
+    public PageResponseDTO<ProductResponseDTO> searchProducts(ProductSearchQueryDTO request) {
+        SearchRequestDTO<ProductField> searchRequest = searchCriteriaBuilder.build(request);
+        int page = request.getPage() == null ? paginationProperties.getDefaultPage() : request.getPage();
+        int size = request.getSize() == null ? paginationProperties.getDefaultPageSize() : request.getSize();
+        validatePage(page, size);
+        Query query = searchQueryBuilder.build(searchRequest, request.getQuery());
         long total = mongoTemplate.count(Query.of(query), ProductEntity.class);
         query.skip((long) page * size).limit(size);
         List<ProductResponseDTO> content = mongoTemplate.find(query, ProductEntity.class).stream()

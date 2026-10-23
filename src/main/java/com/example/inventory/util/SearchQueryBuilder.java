@@ -28,9 +28,22 @@ public class SearchQueryBuilder {
      * Returns the result of the build operation.
      */
     public <F> Query build(SearchRequestDTO<F> request) {
+        return build(request, null);
+    }
+
+    public <F> Query build(SearchRequestDTO<F> request, String keyword) {
         Query query = new Query();
         if (request.getFilters() != null) {
             request.getFilters().forEach(filter -> query.addCriteria(toCriteria(filter)));
+        }
+        if (keyword != null && !keyword.isBlank()) {
+            String text = Pattern.quote(keyword);
+            query.addCriteria(new Criteria().orOperator(
+                    Criteria.where(ProductField.TITLE.getValue()).regex(".*" + text + ".*", "i"),
+                    Criteria.where(ProductField.DESCRIPTION.getValue()).regex(".*" + text + ".*", "i"),
+                    Criteria.where(ProductField.SKU.getValue()).regex(".*" + text + ".*", "i"),
+                    Criteria.where(ProductField.BRAND.getValue()).regex(".*" + text + ".*", "i"),
+                    Criteria.where(ProductField.CATEGORY.getValue()).regex(".*" + text + ".*", "i")));
         }
         if (request.getSortBy() != null && !request.getSortBy().isBlank()) {
             String field = searchFieldFor(request.getSortBy(), request.getFilters());

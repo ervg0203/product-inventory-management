@@ -2,6 +2,7 @@ package com.example.inventory.service.impl;
 
 import com.example.inventory.dto.request.WarehouseRequestDTO;
 import com.example.inventory.dto.common.SearchRequestDTO;
+import com.example.inventory.dto.common.WarehouseSearchQueryDTO;
 import com.example.inventory.enums.WarehouseField;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.dto.common.ImportResponseDTO;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import com.example.inventory.util.SearchQueryBuilder;
+import com.example.inventory.util.SearchCriteriaBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final ImportProperties importProperties;
     private final MongoTemplate mongoTemplate;
     private final SearchQueryBuilder searchQueryBuilder;
+    private final SearchCriteriaBuilder searchCriteriaBuilder;
 
     @Override
     public PageResponseDTO<WarehouseResponseDTO> searchWarehouses(SearchRequestDTO<WarehouseField> request) {
@@ -67,6 +70,25 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .page(page).pageSize(size).totalPages(totalPages)
                 .first(page == 0).last(totalPages == 0 || page >= totalPages - 1).build();
     }
+
+    @Override
+    public PageResponseDTO<WarehouseResponseDTO> searchWarehouses(WarehouseSearchQueryDTO request) {
+        SearchRequestDTO<WarehouseField> searchRequest = searchCriteriaBuilder.build(request);
+        int page = request.getPage() == null ? paginationProperties.getDefaultPage() : request.getPage();
+        int size = request.getSize() == null ? paginationProperties.getDefaultPageSize() : request.getSize();
+        validatePage(page, size);
+        Query query = searchQueryBuilder.build(searchRequest);
+        searchCriteriaBuilder.addWarehouseKeywordCriteria(query, request.getQuery());
+        long total = mongoTemplate.count(Query.of(query), WarehouseEntity.class);
+        query.skip((long) page * size).limit(size);
+        List<WarehouseResponseDTO> content = mongoTemplate.find(query, WarehouseEntity.class).stream()
+                .map(warehouseMapper::toResponseDTO).toList();
+        int totalPages = (int) Math.ceil((double) total / size);
+        return PageResponseDTO.<WarehouseResponseDTO>builder().content(content).totalRecords(total)
+                .page(page).pageSize(size).totalPages(totalPages)
+                .first(page == 0).last(totalPages == 0 || page >= totalPages - 1).build();
+    }
+
 
     @Override
     /**

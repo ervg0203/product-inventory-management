@@ -4,6 +4,7 @@ import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.common.ImportResponseDTO;
 import com.example.inventory.dto.request.WarehouseRequestDTO;
 import com.example.inventory.dto.common.SearchRequestDTO;
+import com.example.inventory.dto.common.WarehouseSearchQueryDTO;
 import com.example.inventory.enums.WarehouseField;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.dto.response.WarehouseResponseDTO;
@@ -11,6 +12,7 @@ import com.example.inventory.service.WarehouseService;
 import com.example.inventory.config.PaginationProperties;
 import com.example.inventory.util.WarehouseExcelParser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,7 +58,7 @@ public class WarehouseController {
                         size == null ? paginationProperties.getDefaultPageSize() : size)));
     }
 
-    @PostMapping("/search")
+    @PostMapping("/advance-search")
     @Operation(summary = "Search warehouses",
             description = "Searches warehouses using allowlisted fields and operators. Filters use AND semantics; "
                     + "page is zero-based and size is limited to the configured maximum.")
@@ -67,6 +69,73 @@ public class WarehouseController {
     })
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<WarehouseResponseDTO>>> searchWarehouses(
             @RequestBody SearchRequestDTO<WarehouseField> request) {
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses searched successfully",
+                warehouseService.searchWarehouses(request)));
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search warehouses with query parameters",
+            description = "Searches warehouses using AND semantics for supplied filters and OR semantics across "
+                    + "code, name, address, city, state, and postal code for query. If no criteria are supplied, "
+                    + "this returns a paginated warehouse listing.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Warehouses searched successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid search criteria, pagination, or sorting."),
+            @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable.")
+    })
+    public ResponseEntity<ApiResponseDTO<PageResponseDTO<WarehouseResponseDTO>>> searchWarehousesByQuery(
+            @Parameter(description = "Keyword across code, name, address, city, state, and postal code.",
+                    example = "London")
+            @RequestParam(required = false) String query,
+            @Parameter(description = "Exact warehouse code.", example = "WH-001")
+            @RequestParam(required = false) String code,
+            @Parameter(description = "Partial, case-insensitive warehouse name.", example = "Central")
+            @RequestParam(required = false) String name,
+            @Parameter(description = "Partial, case-insensitive address.", example = "Main Street")
+            @RequestParam(required = false) String address,
+            @Parameter(description = "Partial, case-insensitive city.", example = "London")
+            @RequestParam(required = false) String city,
+            @Parameter(description = "Partial, case-insensitive state.", example = "California")
+            @RequestParam(required = false) String state,
+            @Parameter(description = "Partial, case-insensitive postal code.", example = "10001")
+            @RequestParam(required = false) String postalCode,
+            @Parameter(description = "Exact active status.", example = "true")
+            @RequestParam(required = false) Boolean active,
+            @Parameter(description = "Comma-separated exact warehouse codes.", example = "WH-001,WH-002")
+            @RequestParam(required = false) String codes,
+            @Parameter(description = "Comma-separated exact warehouse names.", example = "Central,North")
+            @RequestParam(required = false) String names,
+            @Parameter(description = "Comma-separated exact cities.", example = "London,Paris")
+            @RequestParam(required = false) String cities,
+            @Parameter(description = "Comma-separated exact states.", example = "CA,NY")
+            @RequestParam(required = false) String states,
+            @Parameter(description = "Zero-based page number.", example = "0",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(defaultValue = "0", minimum = "0"))
+            @RequestParam(required = false) Integer page,
+            @Parameter(description = "Page size, from 1 through 100.", example = "10",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(defaultValue = "20", minimum = "1", maximum = "100"))
+            @RequestParam(required = false) Integer size,
+            @Parameter(description = "WarehouseEntity field to sort by.", example = "name")
+            @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Sort direction: ASC or DESC.", example = "ASC")
+            @RequestParam(required = false) String sortDirection) {
+        WarehouseSearchQueryDTO request = new WarehouseSearchQueryDTO();
+        request.setQuery(query);
+        request.setCode(code);
+        request.setName(name);
+        request.setAddress(address);
+        request.setCity(city);
+        request.setState(state);
+        request.setPostalCode(postalCode);
+        request.setActive(active);
+        request.setCodes(codes);
+        request.setNames(names);
+        request.setCities(cities);
+        request.setStates(states);
+        request.setPage(page);
+        request.setSize(size);
+        request.setSortBy(sortBy);
+        request.setSortDirection(sortDirection);
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses searched successfully",
                 warehouseService.searchWarehouses(request)));
     }

@@ -5,6 +5,7 @@ import com.example.inventory.dto.response.WarehouseResponseDTO;
 import com.example.inventory.dto.common.ImportResponseDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.dto.common.SearchRequestDTO;
+import com.example.inventory.dto.common.WarehouseSearchQueryDTO;
 import com.example.inventory.enums.WarehouseField;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 public interface WarehouseService {
     PageResponseDTO<WarehouseResponseDTO> getAllWarehouses(int page, int size);
     PageResponseDTO<WarehouseResponseDTO> searchWarehouses(SearchRequestDTO<WarehouseField> request);
+    PageResponseDTO<WarehouseResponseDTO> searchWarehouses(WarehouseSearchQueryDTO request);
     WarehouseResponseDTO getWarehouseById(String id);
     WarehouseResponseDTO createWarehouse(WarehouseRequestDTO request);
     List<WarehouseResponseDTO> createWarehouses(List<WarehouseRequestDTO> requests);

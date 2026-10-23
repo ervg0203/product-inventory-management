@@ -2,6 +2,7 @@ package com.example.inventory.controller;
 
 import com.example.inventory.dto.request.ProductRequestDTO;
 import com.example.inventory.dto.common.SearchRequestDTO;
+import com.example.inventory.dto.common.ProductSearchQueryDTO;
 import com.example.inventory.enums.ProductField;
 import com.example.inventory.dto.common.ApiResponseDTO;
 import com.example.inventory.dto.common.ImportResponseDTO;
@@ -11,6 +12,7 @@ import com.example.inventory.service.ProductService;
 import com.example.inventory.config.PaginationProperties;
 import com.example.inventory.util.ProductExcelParser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,7 +58,7 @@ public class ProductController {
                         size == null ? paginationProperties.getDefaultPageSize() : size)));
     }
 
-    @PostMapping("/search")
+    @PostMapping("/advance-search")
     @Operation(summary = "Search products", description = "Searches products using allowlisted fields and operators. "
             + "Filters use AND semantics; page is zero-based and size is limited to 100.")
     @ApiResponses({
@@ -69,6 +71,115 @@ public class ProductController {
      */
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> searchProducts(
             @RequestBody SearchRequestDTO<ProductField> request) {
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products searched successfully",
+                productService.searchProducts(request)));
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search products with query parameters",
+            description = "Searches products using AND semantics for supplied filters and OR semantics across "
+                    + "title, description, SKU, brand, and category for query. If no filters are supplied, "
+                    + "this returns a paginated product listing. Range and explicit comparison filters for the "
+                    + "same numeric field cannot be combined.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Products searched successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid search criteria, pagination, sorting, or value type."),
+            @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable.")
+    })
+    public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> searchProductsByQuery(
+            @Parameter(description = "Keyword across title, description, SKU, brand, and category.",
+                    example = "phone")
+            @RequestParam(required = false) String query,
+            @Parameter(description = "Partial, case-insensitive title match.", example = "Galaxy")
+            @RequestParam(required = false) String title,
+            @Parameter(description = "Partial, case-insensitive description match.", example = "wireless")
+            @RequestParam(required = false) String description,
+            @Parameter(description = "Exact SKU match.", example = "SKU-1001")
+            @RequestParam(required = false) String sku,
+            @Parameter(description = "Exact brand match.", example = "Samsung")
+            @RequestParam(required = false) String brand,
+            @Parameter(description = "Exact category match.", example = "smartphones")
+            @RequestParam(required = false) String category,
+            @Parameter(description = "Exact return-policy match.", example = "30 days")
+            @RequestParam(required = false) String returnPolicy,
+            @Parameter(description = "Inclusive minimum price.", example = "500",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(type = "number"))
+            @RequestParam(required = false) String minPrice,
+            @Parameter(description = "Inclusive maximum price.", example = "1500",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(type = "number"))
+            @RequestParam(required = false) String maxPrice,
+            @Parameter(description = "Inclusive minimum rating.", example = "4",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(type = "number"))
+            @RequestParam(required = false) String minRating,
+            @Parameter(description = "Inclusive maximum rating.", example = "5",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(type = "number"))
+            @RequestParam(required = false) String maxRating,
+            @Parameter(description = "Inclusive minimum discount percentage.", example = "10",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(type = "number"))
+            @RequestParam(required = false) String minDiscountPercentage,
+            @Parameter(description = "Inclusive maximum discount percentage.", example = "50",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(type = "number"))
+            @RequestParam(required = false) String maxDiscountPercentage,
+            @Parameter(description = "Numeric price operator: EQUALS, NOT_EQUALS, GREATER_THAN, "
+                    + "GREATER_THAN_OR_EQUAL, LESS_THAN, or LESS_THAN_OR_EQUAL.", example = "LESS_THAN")
+            @RequestParam(required = false) String priceOperator,
+            @Parameter(description = "Value paired with priceOperator.", example = "1000",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(type = "number"))
+            @RequestParam(required = false) String priceValue,
+            @Parameter(description = "Numeric rating operator.", example = "GREATER_THAN_OR_EQUAL")
+            @RequestParam(required = false) String ratingOperator,
+            @Parameter(description = "Value paired with ratingOperator.", example = "4",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(type = "number"))
+            @RequestParam(required = false) String ratingValue,
+            @Parameter(description = "Numeric discount operator.", example = "LESS_THAN")
+            @RequestParam(required = false) String discountOperator,
+            @Parameter(description = "Value paired with discountOperator.", example = "20",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(type = "number"))
+            @RequestParam(required = false) String discountValue,
+            @Parameter(description = "Comma-separated exact brand values.", example = "Samsung,Apple")
+            @RequestParam(required = false) String brands,
+            @Parameter(description = "Comma-separated exact category values.", example = "smartphones,tablets")
+            @RequestParam(required = false) String categories,
+            @Parameter(description = "Exactly two comma-separated inclusive price bounds.", example = "500,2000")
+            @RequestParam(required = false) String priceBetween,
+            @Parameter(description = "Exactly two comma-separated inclusive rating bounds.", example = "3,5")
+            @RequestParam(required = false) String ratingBetween,
+            @Parameter(description = "Zero-based page number.", example = "0", schema = @io.swagger.v3.oas.annotations.media.Schema(defaultValue = "0", minimum = "0"))
+            @RequestParam(required = false) Integer page,
+            @Parameter(description = "Page size, from 1 through 100.", example = "10", schema = @io.swagger.v3.oas.annotations.media.Schema(defaultValue = "20", minimum = "1", maximum = "100"))
+            @RequestParam(required = false) Integer size,
+            @Parameter(description = "ProductEntity field to sort by.", example = "price")
+            @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Sort direction: ASC or DESC.", example = "ASC")
+            @RequestParam(required = false) String sortDirection) {
+        ProductSearchQueryDTO request = new ProductSearchQueryDTO();
+        request.setQuery(query);
+        request.setTitle(title);
+        request.setDescription(description);
+        request.setSku(sku);
+        request.setBrand(brand);
+        request.setCategory(category);
+        request.setReturnPolicy(returnPolicy);
+        request.setMinPrice(minPrice);
+        request.setMaxPrice(maxPrice);
+        request.setMinRating(minRating);
+        request.setMaxRating(maxRating);
+        request.setMinDiscountPercentage(minDiscountPercentage);
+        request.setMaxDiscountPercentage(maxDiscountPercentage);
+        request.setPriceOperator(priceOperator);
+        request.setPriceValue(priceValue);
+        request.setRatingOperator(ratingOperator);
+        request.setRatingValue(ratingValue);
+        request.setDiscountOperator(discountOperator);
+        request.setDiscountValue(discountValue);
+        request.setBrands(brands);
+        request.setCategories(categories);
+        request.setPriceBetween(priceBetween);
+        request.setRatingBetween(ratingBetween);
+        request.setPage(page);
+        request.setSize(size);
+        request.setSortBy(sortBy);
+        request.setSortDirection(sortDirection);
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products searched successfully",
                 productService.searchProducts(request)));
     }

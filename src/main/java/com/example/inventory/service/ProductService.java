@@ -4,6 +4,7 @@ import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.dto.common.ImportResponseDTO;
 import com.example.inventory.dto.common.PageResponseDTO;
 import com.example.inventory.dto.common.SearchRequestDTO;
+import com.example.inventory.dto.common.ProductSearchQueryDTO;
 import com.example.inventory.enums.ProductField;
 
 import java.util.List;
@@ -13,6 +14,8 @@ public interface ProductService {
     PageResponseDTO<ProductResponseDTO> getAllProducts(int page, int size);
 
     PageResponseDTO<ProductResponseDTO> searchProducts(SearchRequestDTO<ProductField> request);
+
+    PageResponseDTO<ProductResponseDTO> searchProducts(ProductSearchQueryDTO request);
 
     ProductResponseDTO getProductById(String id);
 
