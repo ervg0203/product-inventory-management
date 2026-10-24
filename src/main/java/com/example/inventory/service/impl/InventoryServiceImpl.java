@@ -380,8 +380,13 @@ public class InventoryServiceImpl implements InventoryService {
 
     private void addError(InventoryRequestDTO request, String field, String message) {
         request.setIsValid(false);
-        request.getErrors().add(ErrorsDTO.builder()
-                .field(field).message(message).build());
+        boolean duplicate = request.getErrors().stream()
+                .anyMatch(error -> field.equals(error.getField())
+                        && message.equals(error.getMessage()));
+        if (!duplicate) {
+            request.getErrors().add(ErrorsDTO.builder()
+                    .field(field).message(message).build());
+        }
     }
 /**
  * Executes the throw if invalid operation.

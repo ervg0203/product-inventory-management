@@ -43,9 +43,8 @@ public class WarehouseValidator {
         if (warehouse == null) {
             return;
         }
-        if (warehouse.getCode() == null || warehouse.getCode().isBlank()) {
-            addError(warehouse, ErrorMessage.REQUIRED, WarehouseField.CODE);
-        } else if (existingCodes == null || !existingCodes.contains(warehouse.getCode())) {
+        if (warehouse.getCode() != null && !warehouse.getCode().isBlank()
+                && (existingCodes == null || !existingCodes.contains(warehouse.getCode()))) {
             addError(warehouse, ErrorMessage.NOT_FOUND, WarehouseField.CODE);
         }
     }
@@ -81,9 +80,15 @@ public class WarehouseValidator {
         Object[] messageArguments = new Object[arguments.length + 1];
         messageArguments[0] = field.getLabel();
         System.arraycopy(arguments, 0, messageArguments, 1, arguments.length);
-        warehouse.getErrors().add(ErrorsDTO.builder()
-                .message(message.format(messageArguments))
-                .field(field.getValue())
-                .build());
+        String formattedMessage = message.format(messageArguments);
+        boolean duplicate = warehouse.getErrors().stream()
+                .anyMatch(error -> field.getValue().equals(error.getField())
+                        && formattedMessage.equals(error.getMessage()));
+        if (!duplicate) {
+            warehouse.getErrors().add(ErrorsDTO.builder()
+                    .message(formattedMessage)
+                    .field(field.getValue())
+                    .build());
+        }
     }
 }

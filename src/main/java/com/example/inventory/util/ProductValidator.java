@@ -54,9 +54,8 @@ public final class ProductValidator {
     public void validateForUpdate(ProductRequestDTO product, Set<String> existingProductSkus) {
         validate(product);
 
-        if (product.getSku() == null || product.getSku().isBlank()) {
-            addError(product, ErrorMessage.REQUIRED, ProductField.SKU);
-        } else if (existingProductSkus == null || !existingProductSkus.contains(product.getSku())) {
+        if (product.getSku() != null && !product.getSku().isBlank()
+                && (existingProductSkus == null || !existingProductSkus.contains(product.getSku()))) {
             addError(product, ErrorMessage.NOT_FOUND, ProductField.SKU);
         }
     }
@@ -139,9 +138,15 @@ public final class ProductValidator {
         Object[] messageArguments = new Object[arguments.length + 1];
         messageArguments[0] = field.getLabel();
         System.arraycopy(arguments, 0, messageArguments, 1, arguments.length);
-        product.getErrors().add(ErrorsDTO.builder()
-                .message(message.format(messageArguments))
-                .field(field.getValue())
-                .build());
+        String formattedMessage = message.format(messageArguments);
+        boolean duplicate = product.getErrors().stream()
+                .anyMatch(error -> field.getValue().equals(error.getField())
+                        && formattedMessage.equals(error.getMessage()));
+        if (!duplicate) {
+            product.getErrors().add(ErrorsDTO.builder()
+                    .message(formattedMessage)
+                    .field(field.getValue())
+                    .build());
+        }
     }
 }

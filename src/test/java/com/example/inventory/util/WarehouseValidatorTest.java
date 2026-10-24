@@ -32,4 +32,16 @@ class WarehouseValidatorTest {
         assertFalse(warehouse.getIsValid());
         assertEquals("code", warehouse.getErrors().getLast().getField());
     }
+
+    @Test
+    void doesNotDuplicateRequiredCodeErrorDuringUpdateValidation() {
+        WarehouseRequestDTO warehouse = WarehouseRequestDTO.builder().code("").build();
+
+        validator.validateForUpdate(warehouse, Set.of());
+
+        assertEquals(1, warehouse.getErrors().stream()
+                .filter(error -> "code".equals(error.getField())
+                        && "Warehouse code is required".equals(error.getMessage()))
+                .count());
+    }
 }

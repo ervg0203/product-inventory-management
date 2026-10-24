@@ -52,6 +52,18 @@ class ProductValidatorTest {
     }
 
     @Test
+    void doesNotDuplicateRequiredSkuErrorDuringUpdateValidation() {
+        ProductRequestDTO product = ProductRequestDTO.builder().sku("").build();
+
+        validator.validateForUpdate(product, Set.of());
+
+        assertEquals(1, product.getErrors().stream()
+                .filter(error -> "sku".equals(error.getField())
+                        && "SKU is required".equals(error.getMessage()))
+                .count());
+    }
+
+    @Test
     void nullIsIgnored() {
         assertDoesNotThrow(() -> validator.validate(null));
     }
