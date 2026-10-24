@@ -18,6 +18,7 @@ public final class ProductValidator {
 
     /**
      * Performs the validate operation.
+ * @param product input value
      */
     public void validate(ProductRequestDTO product) {
         if (product == null) {
@@ -47,6 +48,8 @@ public final class ProductValidator {
 
     /**
      * Performs the validate for update operation.
+ * @param product input value
+ * @param existingProductSkus input value
      */
     public void validateForUpdate(ProductRequestDTO product, Set<String> existingProductSkus) {
         validate(product);
@@ -57,6 +60,14 @@ public final class ProductValidator {
             addError(product, ErrorMessage.NOT_FOUND, ProductField.SKU);
         }
     }
+/**
+ * Executes the validate text operation.
+ *
+ * @param product input value
+ * @param field input value
+ * @param value input value
+ * @param maxLength input value
+ */
 
     private static void validateText(ProductRequestDTO product,
                                      ProductField field, String value, int maxLength) {
@@ -66,7 +77,32 @@ public final class ProductValidator {
             addError(product, ErrorMessage.TOO_LONG, field);
         }
     }
+/**
+ * Executes the validate decimal operation.
+ *
+ * @param product input value
+ * @param field input value
+ * @param value input value
+ * @param inclusiveMinimum input value
+ * @param maximum input value
+ * @param integerDigits input value
+ * @param minimumMessage input value
+ * @param maximumMessage input value
+ */
 
+    /**
+     * Validates a decimal product field against its business rules.
+     *
+     * @param product product request being validated
+//     * @param fieldName field name used in validation messages
+     * @param value decimal value to validate
+//     * @param errors validation errors collected for the product
+ * @param inclusiveMinimum input value
+ * @param maximum input value
+ * @param integerDigits input value
+ * @param minimumMessage input value
+ * @param maximumMessage input value
+     */
     private static void validateDecimal(ProductRequestDTO product,
                                         ProductField field, BigDecimal value,
                                         boolean inclusiveMinimum, BigDecimal maximum,
@@ -87,6 +123,14 @@ public final class ProductValidator {
             addError(product, ErrorMessage.SCALE, field, 2);
         }
     }
+/**
+ * Executes the add error operation.
+ *
+ * @param product input value
+ * @param message input value
+ * @param field input value
+ * @param arguments input value
+ */
 
     private static void addError(ProductRequestDTO product,
                                  ErrorMessage message, ProductField field,

@@ -20,6 +20,12 @@ import java.util.regex.Pattern;
 
 @Component
 public class SearchCriteriaBuilder {
+/**
+ * Executes the build operation.
+ *
+ * @param request input value
+ * @return operation result
+ */
 
     public SearchRequestDTO<ProductField> build(ProductSearchQueryDTO request) {
         if (request == null) {
@@ -62,6 +68,14 @@ public class SearchCriteriaBuilder {
                 .sortDirection(direction)
                 .build();
     }
+/**
+ * Executes the add text filter operation.
+ *
+ * @param filters input value
+ * @param field input value
+ * @param value input value
+ * @param operator input value
+ */
 
     private void addTextFilter(List<FilterDTO<ProductField>> filters, ProductField field, String value,
                                SearchOperator operator) {
@@ -69,6 +83,13 @@ public class SearchCriteriaBuilder {
             filters.add(FilterDTO.<ProductField>builder().field(field).operator(operator).value(value).build());
         }
     }
+/**
+ * Executes the add list filter operation.
+ *
+ * @param filters input value
+ * @param field input value
+ * @param value input value
+ */
 
     private void addListFilter(List<FilterDTO<ProductField>> filters, ProductField field, String value) {
         if (value != null) {
@@ -77,6 +98,17 @@ public class SearchCriteriaBuilder {
         }
 
     }
+/**
+ * Executes the add range filters operation.
+ *
+ * @param filters input value
+ * @param field input value
+ * @param min input value
+ * @param max input value
+ * @param between input value
+ * @param operatorText input value
+ * @param operatorValue input value
+ */
 
     private void addRangeFilters(List<FilterDTO<ProductField>> filters, ProductField field, String min, String max,
                                  String between, String operatorText, String operatorValue) {
@@ -114,11 +146,26 @@ public class SearchCriteriaBuilder {
             filters.add(numericFilter(field, operator, operatorValue));
         }
     }
+/**
+ * Executes the numeric filter operation.
+ *
+ * @param field input value
+ * @param operator input value
+ * @param value input value
+ * @return operation result
+ */
 
     private FilterDTO<ProductField> numericFilter(ProductField field, SearchOperator operator, String value) {
         return FilterDTO.<ProductField>builder().field(field).operator(operator)
                 .value(parseNumber(value, field.getValue())).build();
     }
+/**
+ * Executes the parse number operation.
+ *
+ * @param value input value
+ * @param field input value
+ * @return operation result
+ */
 
     private BigDecimal parseNumber(String value, String field) {
         try {
@@ -127,6 +174,13 @@ public class SearchCriteriaBuilder {
             throw new IllegalArgumentException("Invalid numeric value for " + field + ": " + value);
         }
     }
+/**
+ * Executes the parse list operation.
+ *
+ * @param value input value
+ * @param field input value
+ * @return operation result
+ */
 
     private List<String> parseList(String value, String field) {
         if (value.isBlank()) {
@@ -138,6 +192,12 @@ public class SearchCriteriaBuilder {
         }
         return values;
     }
+/**
+ * Executes the parse sort direction operation.
+ *
+ * @param value input value
+ * @return operation result
+ */
 
     private SortDirection parseSortDirection(String value) {
         if (value == null) {
@@ -149,6 +209,13 @@ public class SearchCriteriaBuilder {
             throw new IllegalArgumentException("Unsupported sort direction: " + value);
         }
     }
+/**
+ * Executes the validate sort field operation.
+ *
+ * @param value input value
+ * @param direction input value
+ * @return operation result
+ */
 
     private String validateSortField(String value, SortDirection direction) {
         if (value == null) {
@@ -162,6 +229,12 @@ public class SearchCriteriaBuilder {
         }
         return ProductField.fromValue(value).getValue();
     }
+/**
+ * Executes the build operation.
+ *
+ * @param request input value
+ * @return operation result
+ */
 
     public SearchRequestDTO<WarehouseField> build(WarehouseSearchQueryDTO request) {
         if (request == null) {
@@ -191,6 +264,12 @@ public class SearchCriteriaBuilder {
                 .size(request.getSize()).sortBy(validateWarehouseSortField(request.getSortBy(), direction))
                 .sortDirection(direction).build();
     }
+/**
+ * Executes the add warehouse keyword criteria operation.
+ *
+ * @param query input value
+ * @param keyword input value
+ */
 
     public void addWarehouseKeywordCriteria(Query query, String keyword) {
         if (keyword == null) {
@@ -205,6 +284,14 @@ public class SearchCriteriaBuilder {
                 Criteria.where(WarehouseField.STATE.getValue()).regex(".*" + text + ".*", "i"),
                 Criteria.where(WarehouseField.POSTAL_CODE.getValue()).regex(".*" + text + ".*", "i")));
     }
+/**
+ * Executes the add warehouse text filter operation.
+ *
+ * @param filters input value
+ * @param field input value
+ * @param value input value
+ * @param operator input value
+ */
 
     private void addWarehouseTextFilter(List<FilterDTO<WarehouseField>> filters, WarehouseField field,
                                         String value, SearchOperator operator) {
@@ -212,6 +299,14 @@ public class SearchCriteriaBuilder {
             filters.add(FilterDTO.<WarehouseField>builder().field(field).operator(operator).value(value).build());
         }
     }
+/**
+ * Executes the add warehouse list filter operation.
+ *
+ * @param filters input value
+ * @param field input value
+ * @param value input value
+ * @return operation result
+ */
 
     private void addWarehouseListFilter(List<FilterDTO<WarehouseField>> filters, WarehouseField field,
                                         String value) {
@@ -224,6 +319,13 @@ public class SearchCriteriaBuilder {
                     .value(values).build());
         }
     }
+/**
+ * Executes the validate warehouse sort field operation.
+ *
+ * @param value input value
+ * @param direction input value
+ * @return operation result
+ */
 
     private String validateWarehouseSortField(String value, SortDirection direction) {
         if (value == null) {

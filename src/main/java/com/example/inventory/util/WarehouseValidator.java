@@ -17,6 +17,7 @@ public class WarehouseValidator {
 
     /**
      * Performs the validate operation.
+ * @param warehouse input value
      */
     public void validate(WarehouseRequestDTO warehouse) {
         if (warehouse == null) {
@@ -34,6 +35,8 @@ public class WarehouseValidator {
 
     /**
      * Performs the validate for update operation.
+ * @param warehouse input value
+ * @param existingCodes input value
      */
     public void validateForUpdate(WarehouseRequestDTO warehouse, Set<String> existingCodes) {
         validate(warehouse);
@@ -46,6 +49,14 @@ public class WarehouseValidator {
             addError(warehouse, ErrorMessage.NOT_FOUND, WarehouseField.CODE);
         }
     }
+/**
+ * Executes the validate text operation.
+ *
+ * @param warehouse input value
+ * @param field input value
+ * @param value input value
+ * @param maxLength input value
+ */
 
     private void validateText(WarehouseRequestDTO warehouse, WarehouseField field,
                               String value, int maxLength) {
@@ -55,6 +66,14 @@ public class WarehouseValidator {
             addError(warehouse, ErrorMessage.TOO_LONG, field);
         }
     }
+/**
+ * Executes the add error operation.
+ *
+ * @param warehouse input value
+ * @param message input value
+ * @param field input value
+ * @param arguments input value
+ */
 
     private void addError(WarehouseRequestDTO warehouse, ErrorMessage message,
                           WarehouseField field, Object... arguments) {

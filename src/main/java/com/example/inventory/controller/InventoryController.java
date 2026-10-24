@@ -42,6 +42,8 @@ public class InventoryController {
     })
     /**
      * Handles the create inventory endpoint.
+ * @param request input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<InventoryResponseDTO>> createInventory(
             @Valid @RequestBody InventoryRequestDTO request) {
@@ -53,6 +55,12 @@ public class InventoryController {
     @PostMapping("/create-multi")
     @Operation(summary = "Create inventory in bulk",
             description = "Creates multiple inventory records after validating the complete request.")
+/**
+ * Executes the create inventories operation.
+ *
+ * @param requests input value
+ * @return operation result
+ */
     public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> createInventories(
             @RequestBody List<InventoryRequestDTO> requests) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -63,6 +71,12 @@ public class InventoryController {
     @PutMapping("/update-multi")
     @Operation(summary = "Update inventory in bulk",
             description = "Updates multiple inventory records using their IDs.")
+/**
+ * Executes the update inventories operation.
+ *
+ * @param requests input value
+ * @return operation result
+ */
     public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> updateInventories(
             @RequestBody List<InventoryRequestDTO> requests) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Inventory records updated successfully",
@@ -79,6 +93,8 @@ public class InventoryController {
     })
     /**
      * Handles the get inventory endpoint.
+ * @param inventoryId input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<InventoryResponseDTO>> getInventory(
             @PathVariable String inventoryId) {
@@ -97,6 +113,8 @@ public class InventoryController {
     })
     /**
      * Handles the get product stock endpoint.
+ * @param productId input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<ProductStockResponseDTO>> getProductStock(
             @PathVariable String productId) {
@@ -115,6 +133,8 @@ public class InventoryController {
     })
     /**
      * Handles the get warehouse inventory endpoint.
+ * @param warehouseId input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> getWarehouseInventory(
             @PathVariable String warehouseId) {
@@ -135,6 +155,9 @@ public class InventoryController {
     })
     /**
      * Handles the set stock endpoint.
+ * @param inventoryId input value
+ * @param request input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<InventoryResponseDTO>> setStock(
             @PathVariable String inventoryId,
@@ -156,6 +179,9 @@ public class InventoryController {
     })
     /**
      * Handles the increase stock endpoint.
+ * @param inventoryId input value
+ * @param request input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<InventoryResponseDTO>> increaseStock(
             @PathVariable String inventoryId,
@@ -177,6 +203,9 @@ public class InventoryController {
     })
     /**
      * Handles the decrease stock endpoint.
+ * @param inventoryId input value
+ * @param request input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<InventoryResponseDTO>> decreaseStock(
             @PathVariable String inventoryId,
@@ -197,6 +226,9 @@ public class InventoryController {
     })
     /**
      * Handles the get low stock endpoint.
+ * @param threshold input value
+ * @param warehouseId input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> getLowStock(
             @RequestParam int threshold,
@@ -216,6 +248,8 @@ public class InventoryController {
     })
     /**
      * Handles the delete inventory endpoint.
+ * @param inventoryId input value
+ * @return operation result
      */
     public ResponseEntity<Void> deleteInventory(@PathVariable String inventoryId) {
         inventoryService.deleteInventory(inventoryId);

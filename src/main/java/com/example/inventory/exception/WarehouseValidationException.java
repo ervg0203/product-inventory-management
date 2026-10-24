@@ -10,6 +10,12 @@ public class WarehouseValidationException extends RuntimeException {
     private final List<WarehouseResponseDTO> warehouses;
     private final int totalErrors;
     private final int totalIncorrectDtos;
+/**
+ * Executes the warehouse validation exception operation.
+ *
+ * @param warehouses input value
+ * @return operation result
+ */
 
     public WarehouseValidationException(List<WarehouseResponseDTO> warehouses) {
         super("One or more warehouses failed validation");

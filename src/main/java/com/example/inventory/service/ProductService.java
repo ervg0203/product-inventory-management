@@ -20,17 +20,44 @@ public interface ProductService {
     ProductResponseDTO getProductById(String id);
 
     ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO);
+/**
+ * Executes the create products operation.
+ *
+ * @param productRequestDTOS input value
+ * @return operation result
+ */
 
     List<ProductResponseDTO> createProducts(List<ProductRequestDTO> productRequestDTOS);
 
     ProductResponseDTO updateProduct(ProductRequestDTO productRequestDTOS);
+/**
+ * Executes the update products operation.
+ *
+ * @param productRequestDTOS input value
+// * @param products input value
+ * @return operation result
+ */
 
     List<ProductResponseDTO> updateProducts(List<ProductRequestDTO> productRequestDTOS);
 
     ImportResponseDTO<ProductResponseDTO> importProducts(List<ProductRequestDTO> products);
+/**
+ * Executes the delete product operation.
+ *
+ * @param id input value
+ */
 
     void deleteProduct(String id);
+/**
+ * Executes the delete products by filters operation.
+ *
+ * @param request input value
+ */
     void deleteProductsByFilters(SearchRequestDTO<ProductField> request);
+/**
+ * Executes the delete all products operation.
+ *
+ */
 
     void deleteAllProducts();
 }

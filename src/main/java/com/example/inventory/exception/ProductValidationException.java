@@ -11,6 +11,12 @@ public class ProductValidationException extends RuntimeException {
     private final List<ProductResponseDTO> products;
     private final int totalErrors;
     private final int totalIncorrectDtos;
+/**
+ * Executes the product validation exception operation.
+ *
+ * @param products input value
+ * @return operation result
+ */
 
     public ProductValidationException(List<ProductResponseDTO> products) {
         super("One or more products failed validation");

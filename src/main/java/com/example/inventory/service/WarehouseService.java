@@ -16,11 +16,38 @@ public interface WarehouseService {
     PageResponseDTO<WarehouseResponseDTO> searchWarehouses(WarehouseSearchQueryDTO request);
     WarehouseResponseDTO getWarehouseById(String id);
     WarehouseResponseDTO createWarehouse(WarehouseRequestDTO request);
+/**
+ * Executes the create warehouses operation.
+ *
+ * @param requests input value
+ * @return operation result
+ */
     List<WarehouseResponseDTO> createWarehouses(List<WarehouseRequestDTO> requests);
     WarehouseResponseDTO updateWarehouse(WarehouseRequestDTO request);
+/**
+ * Executes the update warehouses operation.
+ *
+ * @param requests input value
+// * @param warehouses input value
+ * @return operation result
+ */
     List<WarehouseResponseDTO> updateWarehouses(List<WarehouseRequestDTO> requests);
     ImportResponseDTO<WarehouseResponseDTO> importWarehouses(List<WarehouseRequestDTO> warehouses);
+/**
+ * Executes the delete warehouse operation.
+ *
+ * @param id input value
+ */
     void deleteWarehouse(String id);
+/**
+ * Executes the delete warehouses by filters operation.
+ *
+ * @param request input value
+ */
     void deleteWarehousesByFilters(SearchRequestDTO<WarehouseField> request);
+/**
+ * Executes the delete all warehouses operation.
+ *
+ */
     void deleteAllWarehouses();
 }

@@ -21,11 +21,16 @@ import java.util.regex.Pattern;
 @Component
 /**
  * Provides the search query builder component.
+ * @param request input value
+ * @return operation result
  */
 public class SearchQueryBuilder {
 
     /**
      * Returns the result of the build operation.
+ * @param request input value
+// * @param keyword input value
+ * @return operation result
      */
     public <F> Query build(SearchRequestDTO<F> request) {
         return build(request, null);
@@ -53,6 +58,13 @@ public class SearchQueryBuilder {
         }
         return query;
     }
+/**
+ * Executes the search field for operation.
+ *
+ * @param value input value
+ * @param filters input value
+ * @return operation result
+ */
 
     private <F> String searchFieldFor(String value, List<FilterDTO<F>> filters) {
         boolean warehouseSearch = filters != null && filters.stream()
@@ -70,6 +82,12 @@ public class SearchQueryBuilder {
         }
         return warehouseSearchFieldFor(value).getValue();
     }
+/**
+ * Executes the to criteria operation.
+ *
+ * @param filter input value
+ * @return operation result
+ */
 
     private Criteria toCriteria(FilterDTO<?> filter) {
         if (filter != null && filter.getField() instanceof WarehouseField) {
@@ -77,6 +95,12 @@ public class SearchQueryBuilder {
         }
         return toProductCriteria(filter);
     }
+/**
+ * Executes the to product criteria operation.
+ *
+ * @param filter input value
+ * @return operation result
+ */
 
     private Criteria toProductCriteria(FilterDTO<?> filter) {
         if (filter == null || filter.getField() == null || filter.getOperator() == null
@@ -153,6 +177,12 @@ public class SearchQueryBuilder {
             default -> throw new IllegalArgumentException("Unsupported operator");
         };
     }
+/**
+ * Executes the warehouse search field for operation.
+ *
+ * @param value input value
+ * @return operation result
+ */
 
     private WarehouseField warehouseSearchFieldFor(String value) {
         for (WarehouseField field : WarehouseField.values()) {
@@ -163,6 +193,12 @@ public class SearchQueryBuilder {
         }
         throw new IllegalArgumentException("Unsupported warehouse search or sort field: " + value);
     }
+/**
+ * Executes the to warehouse criteria operation.
+ *
+ * @param filter input value
+ * @return operation result
+ */
 
     private Criteria toWarehouseCriteria(FilterDTO<?> filter) {
         if (filter == null || filter.getField() == null || filter.getOperator() == null
@@ -221,6 +257,13 @@ public class SearchQueryBuilder {
             default -> throw new IllegalArgumentException(operator + " is not compatible with this warehouse field");
         };
     }
+/**
+ * Executes the convert warehouse operation.
+ *
+ * @param value input value
+ * @param type input value
+ * @return operation result
+ */
 
     private Object convertWarehouse(Object value, Class<?> type) {
         if (type == String.class) {
@@ -237,15 +280,33 @@ public class SearchQueryBuilder {
         }
         throw new IllegalArgumentException("Invalid boolean value: " + value);
     }
+/**
+ * Executes the is restricted operation.
+ *
+ * @param field input value
+ * @return operation result
+ */
 
     private boolean isRestricted(ProductField field) {
         return field == ProductField.ID || field == ProductField.CREATED_AT || field == ProductField.UPDATED_AT;
     }
+/**
+ * Executes the is text operator operation.
+ *
+ * @param operator input value
+ * @return operation result
+ */
 
     private boolean isTextOperator(SearchOperator operator) {
         return operator == SearchOperator.CONTAINS || operator == SearchOperator.STARTS_WITH
                 || operator == SearchOperator.ENDS_WITH || operator == SearchOperator.EQUALS;
     }
+/**
+ * Executes the field type operation.
+ *
+ * @param field input value
+ * @return operation result
+ */
 
     private Class<?> fieldType(ProductField field) {
         return switch (field) {
@@ -253,6 +314,13 @@ public class SearchQueryBuilder {
             default -> String.class;
         };
     }
+/**
+ * Executes the convert operation.
+ *
+ * @param value input value
+ * @param type input value
+ * @return operation result
+ */
 
     private Object convert(Object value, Class<?> type) {
         if (value == null) {

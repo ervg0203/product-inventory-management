@@ -54,6 +54,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     /**
      * Returns the result of the search products operation.
+ * @param request input value
+ * @return operation result
      */
     public PageResponseDTO<ProductResponseDTO> searchProducts(SearchRequestDTO<ProductField> request) {
         if (request == null) throw new IllegalArgumentException("Search request cannot be null");
@@ -71,6 +73,12 @@ public class ProductServiceImpl implements ProductService {
                 .page(page).pageSize(size).totalPages(totalPages)
                 .first(page == 0).last(totalPages == 0 || page >= totalPages - 1).build();
     }
+/**
+ * Executes the search products operation.
+ *
+ * @param request input value
+ * @return operation result
+ */
 
     @Override
     public PageResponseDTO<ProductResponseDTO> searchProducts(ProductSearchQueryDTO request) {
@@ -88,6 +96,12 @@ public class ProductServiceImpl implements ProductService {
                 .page(page).pageSize(size).totalPages(totalPages)
                 .first(page == 0).last(totalPages == 0 || page >= totalPages - 1).build();
     }
+/**
+ * Executes the validate page operation.
+ *
+ * @param page input value
+ * @param size input value
+ */
 
     private void validatePage(int page, int size) {
         if (page < 0 || size < 1 || size > paginationProperties.getMaxPageSize()) {
@@ -99,6 +113,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     /**
      * Returns the result of the get all products operation.
+ * @param page input value
+ * @param size input value
+ * @return operation result
      */
     public PageResponseDTO<ProductResponseDTO> getAllProducts(int page, int size) {
 
@@ -124,6 +141,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     /**
      * Returns the result of the get product by id operation.
+ * @param id input value
+ * @return operation result
      */
     public ProductResponseDTO getProductById(String id) {
         ProductEntity productEntity = productRepository.findById(id)
@@ -135,6 +154,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     /**
      * Returns the result of the create product operation.
+ * @param productRequestDTO input value
+ * @return operation result
      */
     public ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) {
         return createProducts(List.of(productRequestDTO)).getFirst();
@@ -143,6 +164,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     /**
      * Provides the create products operation.
+ * @param productRequestDTOs input value
+ * @return operation result
      */
     public List<ProductResponseDTO> createProducts(
             List<ProductRequestDTO> productRequestDTOs) {
@@ -166,6 +189,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     /**
      * Returns the result of the update product operation.
+ * @param productRequestDTOS input value
+ * @return operation result
      */
     public ProductResponseDTO updateProduct(ProductRequestDTO productRequestDTOS) {
         return updateProducts(List.of(productRequestDTOS)).getFirst();
@@ -174,6 +199,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     /**
      * Returns the result of the update products operation.
+ * @param productRequestDTOS input value
+ * @return operation result
      */
     public List<ProductResponseDTO> updateProducts(List<ProductRequestDTO> productRequestDTOS) {
 
@@ -207,6 +234,12 @@ public class ProductServiceImpl implements ProductService {
         log.info("Updated {} products", updatedProducts.size());
         return updatedProducts;
     }
+/**
+ * Executes the import products operation.
+ *
+ * @param products input value
+ * @return operation result
+ */
 
     @Override
     public ImportResponseDTO<ProductResponseDTO> importProducts(List<ProductRequestDTO> products) {
@@ -245,6 +278,11 @@ public class ProductServiceImpl implements ProductService {
                 .updated(updatedProducts)
                 .build();
     }
+/**
+ * Executes the validate product requests operation.
+ *
+ * @param products input value
+ */
 
     private void validateProductRequests(List<ProductRequestDTO> products) {
         if (products == null || products.isEmpty()) {
@@ -254,6 +292,11 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Product entries cannot be null");
         }
     }
+/**
+ * Executes the throw if invalid operation.
+ *
+ * @param products input value
+ */
 
     private void throwIfInvalid(List<ProductRequestDTO> products) {
         List<ProductResponseDTO> invalidProducts = products.stream()
@@ -271,6 +314,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     /**
      * Performs the delete product operation.
+ * @param id input value
      */
     public void deleteProduct(String id) {
         if (!productRepository.existsById(id)) {
@@ -280,6 +324,11 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(id);
         log.info("Deleted product id={}", id);
     }
+/**
+ * Executes the delete products by filters operation.
+ *
+ * @param request input value
+ */
 
     @Override
     public void deleteProductsByFilters(SearchRequestDTO<ProductField> request) {
@@ -297,6 +346,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     /**
      * Performs the delete all products operation.
+ * @param request input value
      */
     public void deleteAllProducts() {
         inventoryRepository.deleteAll();

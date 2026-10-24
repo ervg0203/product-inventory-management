@@ -16,6 +16,8 @@ public class WarehouseMapper {
 
     /**
      * Returns the result of the to entity operation.
+ * @param request input value
+ * @return operation result
      */
     public WarehouseEntity toEntity(WarehouseRequestDTO request) {
         LocalDateTime now = LocalDateTime.now();
@@ -34,6 +36,8 @@ public class WarehouseMapper {
 
     /**
      * Performs the update entity operation.
+ * @param entity input value
+ * @param request input value
      */
     public void updateEntity(WarehouseEntity entity, WarehouseRequestDTO request) {
         entity.setCode(request.getCode());
@@ -48,6 +52,8 @@ public class WarehouseMapper {
 
     /**
      * Returns the result of the to response dto operation.
+ * @param entity input value
+ * @return operation result
      */
     public WarehouseResponseDTO toResponseDTO(WarehouseEntity entity) {
         return WarehouseResponseDTO.builder()
@@ -68,6 +74,8 @@ public class WarehouseMapper {
 
     /**
      * Returns the result of the to response dto operation.
+ * @param request input value
+ * @return operation result
      */
     public WarehouseResponseDTO toResponseDTO(WarehouseRequestDTO request) {
         return WarehouseResponseDTO.builder()

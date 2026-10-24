@@ -28,6 +28,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProductValidationException.class)
     /**
      * Provides the handle product validation operation.
+ * @param exception input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<ValidationErrorResponseDTO<ProductResponseDTO>>> handleProductValidation(
             ProductValidationException exception) {
@@ -44,6 +46,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WarehouseValidationException.class)
     /**
      * Provides the handle warehouse validation operation.
+ * @param exception input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<ValidationErrorResponseDTO<WarehouseResponseDTO>>> handleWarehouseValidation(
             WarehouseValidationException exception) {
@@ -55,6 +59,12 @@ public class GlobalExceptionHandler {
                                 .incorrectDtos(exception.getWarehouses())
                                 .build()));
     }
+/**
+ * Executes the handle inventory validation operation.
+ *
+ * @param exception input value
+ * @return operation result
+ */
 
     @ExceptionHandler(InventoryValidationException.class)
     public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> handleInventoryValidation(
@@ -66,6 +76,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     /**
      * Returns the result of the handle illegal argument operation.
+ * @param exception input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> handleIllegalArgument(IllegalArgumentException exception) {
         log.info("Invalid request: {}", exception.getMessage());
@@ -76,6 +88,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProductNotFoundException.class)
     /**
      * Returns the result of the handle product not found operation.
+ * @param exception input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> handleProductNotFound(ProductNotFoundException exception) {
         log.info("Product not found: {}", exception.getMessage());
@@ -86,6 +100,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WarehouseNotFoundException.class)
     /**
      * Returns the result of the handle warehouse not found operation.
+ * @param exception input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> handleWarehouseNotFound(WarehouseNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -95,6 +111,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({InventoryNotFoundException.class})
     /**
      * Returns the result of the handle inventory not found operation.
+ * @param exception input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> handleInventoryNotFound(RuntimeException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -104,6 +122,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({InventoryConflictException.class, InsufficientStockException.class})
     /**
      * Returns the result of the handle inventory conflict operation.
+ * @param exception input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> handleInventoryConflict(RuntimeException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -113,6 +133,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateKeyException.class)
     /**
      * Returns the result of the handle duplicate key operation.
+ * @param exception input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> handleDuplicateKey(DuplicateKeyException exception) {
         log.warn("Duplicate product request detected");
@@ -123,6 +145,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataAccessException.class)
     /**
      * Returns the result of the handle data access operation.
+ * @param exception input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> handleDataAccess(DataAccessException exception) {
         log.error("Product data access failure", exception);
@@ -133,6 +157,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({HttpMessageNotReadableException.class, MissingServletRequestParameterException.class})
     /**
      * Returns the result of the handle malformed request operation.
+ * @param exception input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> handleMalformedRequest(Exception exception) {
         log.info("Malformed request received: {}", exception.getMessage());
@@ -143,6 +169,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     /**
      * Provides the handle method argument not valid operation.
+ * @param exception input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> handleMethodArgumentNotValid(
             MethodArgumentNotValidException exception) {
@@ -154,6 +182,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     /**
      * Returns the result of the handle unexpected exception operation.
+ * @param exception input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> handleUnexpectedException(Exception exception) {
         log.error("Unexpected application error", exception);

@@ -48,6 +48,9 @@ public class WarehouseController {
     })
     /**
      * Handles the get all warehouses endpoint.
+ * @param page input value
+ * @param size input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<WarehouseResponseDTO>>> getAllWarehouses(
             @RequestParam(required = false) Integer page,
@@ -67,6 +70,12 @@ public class WarehouseController {
             @ApiResponse(responseCode = "400", description = "Invalid search criteria, pagination, sorting, or value type."),
             @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable.")
     })
+/**
+ * Executes the search warehouses operation.
+ *
+ * @param request input value
+ * @return operation result
+ */
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<WarehouseResponseDTO>>> searchWarehouses(
             @RequestBody SearchRequestDTO<WarehouseField> request) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses searched successfully",
@@ -83,6 +92,21 @@ public class WarehouseController {
             @ApiResponse(responseCode = "400", description = "Invalid search criteria, pagination, or sorting."),
             @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable.")
     })
+    /**
+     * Searches warehouses using the supplied query parameters.
+     *
+     * @param query keyword for warehouse text fields
+     * @param code exact warehouse code
+     * @param name partial warehouse name
+     * @param city exact city
+     * @param state exact state
+     * @param active active-status filter
+     * @param page zero-based page number
+     * @param size requested page size
+     * @param sortBy field used for sorting
+     * @param sortDirection sort direction
+     * @return paginated matching warehouses
+     */
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<WarehouseResponseDTO>>> searchWarehousesByQuery(
             @Parameter(description = "Keyword across code, name, address, city, state, and postal code.",
                     example = "London")
@@ -151,6 +175,8 @@ public class WarehouseController {
     })
     /**
      * Handles the get warehouse by id endpoint.
+ * @param id input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<WarehouseResponseDTO>> getWarehouseById(@PathVariable String id) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouse fetched successfully",
@@ -170,6 +196,8 @@ public class WarehouseController {
     })
     /**
      * Handles the create warehouse endpoint.
+ * @param request input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<WarehouseResponseDTO>> createWarehouse(
             @RequestBody WarehouseRequestDTO request) {
@@ -191,6 +219,8 @@ public class WarehouseController {
     })
     /**
      * Handles the create warehouses endpoint.
+ * @param requests input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> createWarehouses(
             @RequestBody List<WarehouseRequestDTO> requests) {
@@ -213,6 +243,8 @@ public class WarehouseController {
     })
     /**
      * Handles the update warehouse endpoint.
+ * @param request input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<WarehouseResponseDTO>> updateWarehouse(
             @RequestBody WarehouseRequestDTO request) {
@@ -234,6 +266,8 @@ public class WarehouseController {
     })
     /**
      * Handles the update warehouses endpoint.
+ * @param requests input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> updateWarehouses(
             @RequestBody List<WarehouseRequestDTO> requests) {
@@ -251,6 +285,12 @@ public class WarehouseController {
             @ApiResponse(responseCode = "422", description = "One or more warehouse rows failed validation."),
             @ApiResponse(responseCode = "503", description = "Warehouse data is temporarily unavailable.")
     })
+/**
+ * Executes the import warehouses operation.
+ *
+ * @param file input value
+ * @return operation result
+ */
     public ResponseEntity<ApiResponseDTO<ImportResponseDTO<WarehouseResponseDTO>>> importWarehouses(
             @RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses imported successfully",
@@ -267,6 +307,8 @@ public class WarehouseController {
     })
     /**
      * Handles the delete all warehouses endpoint.
+ * @param request input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> deleteAllWarehouses() {
         warehouseService.deleteAllWarehouses();
@@ -294,6 +336,8 @@ public class WarehouseController {
     })
     /**
      * Handles the delete warehouse endpoint.
+ * @param id input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> deleteWarehouse(@PathVariable String id) {
         warehouseService.deleteWarehouse(id);

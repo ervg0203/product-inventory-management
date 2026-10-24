@@ -48,6 +48,9 @@ public class ProductController {
     })
     /**
      * Handles the get all products endpoint.
+ * @param page input value
+ * @param size input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> getAllProducts(
             @RequestParam(required = false) Integer page,
@@ -68,6 +71,8 @@ public class ProductController {
     })
     /**
      * Handles the search products endpoint.
+ * @param request input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> searchProducts(
             @RequestBody SearchRequestDTO<ProductField> request) {
@@ -86,6 +91,38 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "Invalid search criteria, pagination, sorting, or value type."),
             @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable.")
     })
+    /**
+     * Searches products using the supplied query parameters.
+     *
+     * @param query keyword to search across product text fields
+     * @param title partial title filter
+     * @param description partial description filter
+     * @param sku exact SKU filter
+     * @param brand exact brand filter
+     * @param category exact category filter
+     * @param returnPolicy exact return-policy filter
+     * @param minPrice inclusive minimum price
+     * @param maxPrice inclusive maximum price
+     * @param minRating inclusive minimum rating
+     * @param maxRating inclusive maximum rating
+     * @param minDiscountPercentage inclusive minimum discount
+     * @param maxDiscountPercentage inclusive maximum discount
+     * @param priceOperator price comparison operator
+     * @param priceValue price comparison value
+     * @param ratingOperator rating comparison operator
+     * @param ratingValue rating comparison value
+     * @param discountOperator discount comparison operator
+     * @param discountValue discount comparison value
+     * @param brands comma-separated brand filters
+     * @param categories comma-separated category filters
+     * @param priceBetween inclusive price range
+     * @param ratingBetween inclusive rating range
+     * @param page zero-based page number
+     * @param size requested page size
+     * @param sortBy field used for sorting
+     * @param sortDirection sort direction
+     * @return paginated matching products
+     */
     public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> searchProductsByQuery(
             @Parameter(description = "Keyword across title, description, SKU, brand, and category.",
                     example = "phone")
@@ -195,6 +232,8 @@ public class ProductController {
     })
     /**
      * Handles the get product by id endpoint.
+ * @param id input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> getProductById(
             @PathVariable String id) {
@@ -215,6 +254,8 @@ public class ProductController {
     })
     /**
      * Handles the create product endpoint.
+ * @param productRequestDTO input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> createProduct(
             @RequestBody ProductRequestDTO productRequestDTO) {
@@ -236,6 +277,8 @@ public class ProductController {
     })
     /**
      * Handles the create products endpoint.
+ * @param productRequestDTOs input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> createProducts(
             @RequestBody List<ProductRequestDTO> productRequestDTOs) {
@@ -258,6 +301,8 @@ public class ProductController {
     })
     /**
      * Handles the update products endpoint.
+ * @param productRequestDTOs input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> updateProducts(
             @RequestBody ProductRequestDTO productRequestDTOs) {
@@ -279,6 +324,8 @@ public class ProductController {
     })
     /**
      * Handles the update products endpoint.
+ * @param productRequestDTOs input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> updateProducts(
             @RequestBody List<ProductRequestDTO> productRequestDTOs) {
@@ -296,6 +343,12 @@ public class ProductController {
             @ApiResponse(responseCode = "422", description = "One or more product rows failed validation."),
             @ApiResponse(responseCode = "503", description = "Product data is temporarily unavailable.")
     })
+/**
+ * Executes the import products operation.
+ *
+ * @param file input value
+ * @return operation result
+ */
     public ResponseEntity<ApiResponseDTO<ImportResponseDTO<ProductResponseDTO>>> importProducts(
             @RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products imported successfully",
@@ -312,6 +365,8 @@ public class ProductController {
     })
     /**
      * Handles the delete all product endpoint.
+ * @param request input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> deleteAllProduct() {
         productService.deleteAllProducts();
@@ -340,6 +395,8 @@ public class ProductController {
     })
     /**
      * Handles the delete product endpoint.
+ * @param id input value
+ * @return operation result
      */
     public ResponseEntity<ApiResponseDTO<Void>> deleteProduct(
             @PathVariable String id) {

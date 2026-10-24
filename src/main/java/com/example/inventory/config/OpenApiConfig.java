@@ -21,6 +21,7 @@ public class OpenApiConfig {
     @Bean
     /**
      * Returns the result of the product inventory open api operation.
+ * @return operation result
      */
     public OpenAPI productInventoryOpenAPI() {
         return new OpenAPI()
@@ -43,6 +44,7 @@ public class OpenApiConfig {
     @Bean
     /**
      * Adds response examples to the error responses declared by controllers.
+ * @return operation result
      */
     public OpenApiCustomizer errorResponseExamples() {
         return openAPI -> openAPI.getPaths().values().forEach(pathItem ->
@@ -69,11 +71,24 @@ public class OpenApiConfig {
                     });
                 }));
     }
+/**
+ * Executes the is documented error operation.
+ *
+ * @param status input value
+ * @return operation result
+ */
 
     private boolean isDocumentedError(String status) {
         return "400".equals(status) || "404".equals(status) || "409".equals(status)
                 || "422".equals(status) || "503".equals(status) || "500".equals(status);
     }
+/**
+ * Executes the error example operation.
+ *
+ * @param status input value
+ * @param path input value
+ * @return operation result
+ */
 
     private Map<String, Object> errorExample(String status, String path) {
         String domain = path.contains("/products") ? "product"

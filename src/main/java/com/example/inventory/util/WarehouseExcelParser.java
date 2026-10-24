@@ -11,6 +11,8 @@ import java.util.*;
 
 /**
  * Converts the first worksheet of a warehouse Excel file into request DTOs.
+// * @param file input value
+ * @return operation result
  */
 @Component
 public class WarehouseExcelParser {
@@ -59,6 +61,12 @@ public class WarehouseExcelParser {
             throw new IllegalArgumentException("Unable to read Excel warehouse file", exception);
         }
     }
+/**
+ * Executes the read headers operation.
+ *
+ * @param row input value
+ * @return operation result
+ */
 
     private Map<String, Integer> readHeaders(Row row) {
         if (row == null) {
@@ -79,6 +87,15 @@ public class WarehouseExcelParser {
         }
         return columns;
     }
+/**
+ * Executes the is blank operation.
+ *
+ * @param row input value
+ * @param columns input value
+ * @param formatter input value
+ * @return operation result
+// * @param String input value
+ */
 
     private boolean isBlank(Row row, Map<String, Integer> columns, DataFormatter formatter) {
         return columns.values().stream().allMatch(index -> {
@@ -86,6 +103,16 @@ public class WarehouseExcelParser {
             return cell == null || formatter.formatCellValue(cell).isBlank();
         });
     }
+/**
+ * Executes the text operation.
+ *
+ * @param row input value
+ * @param columns input value
+ * @param name input value
+ * @param formatter input value
+ * @return operation result
+// * @param String input value
+ */
 
     private String text(Row row, Map<String, Integer> columns, String name,
                         DataFormatter formatter) {
@@ -96,6 +123,16 @@ public class WarehouseExcelParser {
         String value = formatter.formatCellValue(row.getCell(index)).trim();
         return value.isEmpty() ? null : value;
     }
+/**
+ * Executes the boolean value operation.
+ *
+ * @param row input value
+ * @param columns input value
+ * @param name input value
+ * @param formatter input value
+ * @return operation result
+// * @param String input value
+ */
 
     private boolean booleanValue(Row row, Map<String, Integer> columns, String name,
                                  DataFormatter formatter) {

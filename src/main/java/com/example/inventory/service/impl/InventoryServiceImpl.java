@@ -53,6 +53,8 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     /**
      * Returns the result of the create inventory operation.
+ * @param request input value
+ * @return operation result
      */
     public InventoryResponseDTO createInventory(InventoryRequestDTO request) {
         requireProduct(request.getProductId());
@@ -72,6 +74,12 @@ public class InventoryServiceImpl implements InventoryService {
             throw new InventoryConflictException("Inventory already exists for this product and warehouse");
         }
     }
+/**
+ * Executes the create inventories operation.
+ *
+ * @param requests input value
+ * @return operation result
+ */
 
     @Override
     public List<InventoryResponseDTO> createInventories(List<InventoryRequestDTO> requests) {
@@ -89,6 +97,12 @@ public class InventoryServiceImpl implements InventoryService {
         return inventoryRepository.saveAll(entities).stream()
                 .map(inventoryMapper::toResponseDTO).toList();
     }
+/**
+ * Executes the update inventories operation.
+ *
+ * @param requests input value
+ * @return operation result
+ */
 
     @Override
     public List<InventoryResponseDTO> updateInventories(List<InventoryRequestDTO> requests) {
@@ -116,6 +130,8 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     /**
      * Returns the result of the get inventory by id operation.
+ * @param inventoryId input value
+ * @return operation result
      */
     public InventoryResponseDTO getInventoryById(String inventoryId) {
         return inventoryRepository.findById(inventoryId)
@@ -126,6 +142,8 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     /**
      * Returns the result of the get product stock operation.
+ * @param productId input value
+ * @return operation result
      */
     public ProductStockResponseDTO getProductStock(String productId) {
         requireProduct(productId);
@@ -143,6 +161,9 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     /**
      * Returns the result of the get warehouse inventory operation.
+ * @param inventoryId input value
+ * @param request input value
+ * @return operation result
      */
     public List<InventoryResponseDTO> getWarehouseInventory(String warehouseId) {
         requireWarehouse(warehouseId);
@@ -154,6 +175,8 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     /**
      * Returns the result of the set stock operation.
+ * @param inventoryId input value
+ * @return operation result
      */
     public InventoryResponseDTO setStock(String inventoryId, SetStockRequestDTO request) {
         InventoryEntity inventory = requireInventory(inventoryId);
@@ -162,6 +185,9 @@ public class InventoryServiceImpl implements InventoryService {
                 Query.query(Criteria.where("_id").is(inventoryId)),
                 /**
                  * Provides the update operation.
+ * @param inventoryId input value
+ * @return operation result
+ * @param request input value
                  */
                 new Update().set("quantity", request.getQuantity())
                         .set("updatedAt", LocalDateTime.now()),
@@ -173,6 +199,9 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     /**
      * Returns the result of the increase stock operation.
+ * @param inventoryId input value
+ * @param request input value
+ * @return operation result
      */
     public InventoryResponseDTO increaseStock(String inventoryId, StockAdjustmentRequestDTO request) {
         InventoryEntity inventory = requireInventory(inventoryId);
@@ -183,6 +212,8 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     /**
      * Returns the result of the decrease stock operation.
+ * @param inventoryId input value
+ * @return operation result
      */
     public InventoryResponseDTO decreaseStock(String inventoryId, StockAdjustmentRequestDTO request) {
         InventoryEntity inventory = requireInventory(inventoryId);
@@ -193,6 +224,9 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     /**
      * Returns the result of the get low stock operation.
+ * @param threshold input value
+ * @param warehouseId input value
+ * @return operation result
      */
     public List<InventoryResponseDTO> getLowStock(int threshold, String warehouseId) {
         if (threshold < 0) {
@@ -210,6 +244,10 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     /**
      * Performs the delete inventory operation.
+ * @param inventoryId input value
+ * @param amount input value
+ * @param decrease input value
+ * @return operation result
      */
     public void deleteInventory(String inventoryId) {
         requireInventory(inventoryId);
@@ -237,11 +275,22 @@ public class InventoryServiceImpl implements InventoryService {
         }
         return requireInventory(inventoryId);
     }
+/**
+ * Executes the require inventory operation.
+ *
+ * @param inventoryId input value
+ * @return operation result
+ */
 
     private InventoryEntity requireInventory(String inventoryId) {
         return inventoryRepository.findById(inventoryId)
                 .orElseThrow(() -> new InventoryNotFoundException(inventoryId));
     }
+/**
+ * Executes the validate requests operation.
+ *
+ * @param requests input value
+ */
 
     private void validateRequests(List<InventoryRequestDTO> requests) {
         if (requests == null || requests.isEmpty()) {
@@ -255,6 +304,11 @@ public class InventoryServiceImpl implements InventoryService {
             request.setIsValid(true);
         });
     }
+/**
+ * Executes the validate create request operation.
+ *
+ * @param request input value
+ */
 
     private void validateCreateRequest(InventoryRequestDTO request) {
         validateFields(request);
@@ -264,6 +318,13 @@ public class InventoryServiceImpl implements InventoryService {
                     "Inventory already exists for this product and warehouse");
         }
     }
+/**
+ * Executes the validate update request operation.
+ *
+ * @param request input value
+ * @param existing input value
+ * @param String input value
+ */
 
     private void validateUpdateRequest(InventoryRequestDTO request,
                                        Map<String, InventoryEntity> existing) {
@@ -274,6 +335,11 @@ public class InventoryServiceImpl implements InventoryService {
             addError(request, "id", "Inventory ID does not exist");
         }
     }
+/**
+ * Executes the validate fields operation.
+ *
+ * @param request input value
+ */
 
     private void validateFields(InventoryRequestDTO request) {
         if (request.getProductId() == null || request.getProductId().isBlank()) {
@@ -294,16 +360,34 @@ public class InventoryServiceImpl implements InventoryService {
             addError(request, "quantity", "Quantity must be zero or greater");
         }
     }
+/**
+ * Executes the is valid operation.
+ *
+ * @param request input value
+ * @return operation result
+ */
 
     private boolean isValid(InventoryRequestDTO request) {
         return Boolean.TRUE.equals(request.getIsValid());
     }
+/**
+ * Executes the add error operation.
+ *
+ * @param request input value
+ * @param field input value
+ * @param message input value
+ */
 
     private void addError(InventoryRequestDTO request, String field, String message) {
         request.setIsValid(false);
         request.getErrors().add(ErrorsDTO.builder()
                 .field(field).message(message).build());
     }
+/**
+ * Executes the throw if invalid operation.
+ *
+ * @param requests input value
+ */
 
     private void throwIfInvalid(List<InventoryRequestDTO> requests) {
         List<InventoryResponseDTO> invalid = requests.stream()
@@ -313,18 +397,33 @@ public class InventoryServiceImpl implements InventoryService {
             throw new InventoryValidationException(invalid);
         }
     }
+/**
+ * Executes the require product operation.
+ *
+ * @param productId input value
+ */
 
     private void requireProduct(String productId) {
         if (!productRepository.existsById(productId)) {
             throw new ProductNotFoundException(productId);
         }
     }
+/**
+ * Executes the require warehouse operation.
+ *
+ * @param warehouseId input value
+ */
 
     private void requireWarehouse(String warehouseId) {
         if (!warehouseRepository.existsById(warehouseId)) {
             throw new WarehouseNotFoundException(warehouseId);
         }
     }
+/**
+ * Executes the require active warehouse operation.
+ *
+ * @param warehouseId input value
+ */
 
     private void requireActiveWarehouse(String warehouseId) {
         WarehouseEntity warehouse = warehouseRepository.findById(warehouseId)

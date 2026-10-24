@@ -67,6 +67,15 @@ public class ProductExcelParser {
             throw new IllegalArgumentException("Unable to read Excel product file", exception);
         }
     }
+/**
+ * Executes the to product operation.
+ *
+ * @param row input value
+ * @param columns input value
+ * @param formatter input value
+ * @return operation result
+// * @param String input value
+ */
 
     private ProductRequestDTO toProduct(Row row, Map<String, Integer> columns,
                                         DataFormatter formatter) {
@@ -83,6 +92,12 @@ public class ProductExcelParser {
                 .returnPolicy(text(row, columns, "returnpolicy", formatter))
                 .build();
     }
+/**
+ * Executes the read headers operation.
+ *
+ * @param row input value
+ * @return operation result
+ */
 
     private Map<String, Integer> readHeaders(Row row) {
         if (row == null) {
@@ -105,6 +120,15 @@ public class ProductExcelParser {
         }
         return columns;
     }
+/**
+ * Executes the is blank operation.
+ *
+ * @param row input value
+ * @param columns input value
+ * @param formatter input value
+ * @return operation result
+// * @param String input value
+ */
 
     private boolean isBlank(Row row, Map<String, Integer> columns, DataFormatter formatter) {
         return columns.values().stream().allMatch(index -> {
@@ -112,6 +136,16 @@ public class ProductExcelParser {
             return cell == null || formatter.formatCellValue(cell).isBlank();
         });
     }
+/**
+ * Executes the text operation.
+ *
+ * @param row input value
+ * @param columns input value
+ * @param name input value
+ * @param formatter input value
+ * @return operation result
+// * @param String input value
+ */
 
     private String text(Row row, Map<String, Integer> columns, String name,
                         DataFormatter formatter) {
@@ -122,6 +156,16 @@ public class ProductExcelParser {
         String value = formatter.formatCellValue(row.getCell(index)).trim();
         return value.isEmpty() ? null : value;
     }
+/**
+ * Executes the decimal operation.
+ *
+ * @param row input value
+ * @param columns input value
+ * @param name input value
+ * @param formatter input value
+ * @return operation result
+// * @param String input value
+ */
 
     private BigDecimal decimal(Row row, Map<String, Integer> columns, String name,
                                DataFormatter formatter) {

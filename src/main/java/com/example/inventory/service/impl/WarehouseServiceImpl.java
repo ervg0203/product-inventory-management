@@ -50,6 +50,12 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final MongoTemplate mongoTemplate;
     private final SearchQueryBuilder searchQueryBuilder;
     private final SearchCriteriaBuilder searchCriteriaBuilder;
+/**
+ * Executes the search warehouses operation.
+ *
+ * @param request input value
+ * @return operation result
+ */
 
     @Override
     public PageResponseDTO<WarehouseResponseDTO> searchWarehouses(SearchRequestDTO<WarehouseField> request) {
@@ -70,6 +76,12 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .page(page).pageSize(size).totalPages(totalPages)
                 .first(page == 0).last(totalPages == 0 || page >= totalPages - 1).build();
     }
+/**
+ * Executes the search warehouses operation.
+ *
+ * @param request input value
+ * @return operation result
+ */
 
     @Override
     public PageResponseDTO<WarehouseResponseDTO> searchWarehouses(WarehouseSearchQueryDTO request) {
@@ -93,6 +105,9 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     /**
      * Returns the result of the get all warehouses operation.
+ * @param page input value
+ * @param size input value
+ * @return operation result
      */
     public PageResponseDTO<WarehouseResponseDTO> getAllWarehouses(int page, int size) {
         validatePage(page, size);
@@ -107,6 +122,12 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .totalPages(warehousePage.getTotalPages())
                 .build();
     }
+/**
+ * Executes the validate page operation.
+ *
+ * @param page input value
+ * @param size input value
+ */
 
     private void validatePage(int page, int size) {
         if (page < 0 || size < 1 || size > paginationProperties.getMaxPageSize()) {
@@ -118,6 +139,8 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     /**
      * Returns the result of the get warehouse by id operation.
+ * @param id input value
+ * @return operation result
      */
     public WarehouseResponseDTO getWarehouseById(String id) {
         return warehouseRepository.findById(id)
@@ -128,6 +151,8 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     /**
      * Returns the result of the create warehouse operation.
+ * @param request input value
+ * @return operation result
      */
     public WarehouseResponseDTO createWarehouse(WarehouseRequestDTO request) {
         return createWarehouses(List.of(request)).getFirst();
@@ -136,6 +161,8 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     /**
      * Returns the result of the create warehouses operation.
+ * @param requests input value
+ * @return operation result
      */
     public List<WarehouseResponseDTO> createWarehouses(List<WarehouseRequestDTO> requests) {
         validateRequests(requests);
@@ -148,6 +175,8 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     /**
      * Returns the result of the update warehouse operation.
+ * @param request input value
+ * @return operation result
      */
     public WarehouseResponseDTO updateWarehouse(WarehouseRequestDTO request) {
         return updateWarehouses(List.of(request)).getFirst();
@@ -156,6 +185,8 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     /**
      * Returns the result of the update warehouses operation.
+ * @param requests input value
+ * @return operation result
      */
     public List<WarehouseResponseDTO> updateWarehouses(List<WarehouseRequestDTO> requests) {
         validateRequests(requests);
@@ -170,6 +201,12 @@ public class WarehouseServiceImpl implements WarehouseService {
                         .map(request -> existing.get(request.getCode())).toList())
                 .stream().map(warehouseMapper::toResponseDTO).toList();
     }
+/**
+ * Executes the import warehouses operation.
+ *
+ * @param warehouses input value
+ * @return operation result
+ */
 
     @Override
     public ImportResponseDTO<WarehouseResponseDTO> importWarehouses(List<WarehouseRequestDTO> warehouses) {
@@ -210,6 +247,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     /**
      * Performs the delete warehouse operation.
+ * @param id input value
      */
     public void deleteWarehouse(String id) {
         if (!warehouseRepository.existsById(id)) {
@@ -219,6 +257,11 @@ public class WarehouseServiceImpl implements WarehouseService {
         warehouseRepository.deleteById(id);
         log.info("Deleted warehouse id={}", id);
     }
+/**
+ * Executes the delete warehouses by filters operation.
+ *
+ * @param request input value
+ */
 
     @Override
     public void deleteWarehousesByFilters(SearchRequestDTO<WarehouseField> request) {
@@ -238,6 +281,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     /**
      * Performs the delete all warehouses operation.
+ * @param requests input value
      */
     public void deleteAllWarehouses() {
         inventoryRepository.deleteAll();
@@ -253,6 +297,11 @@ public class WarehouseServiceImpl implements WarehouseService {
             throw new IllegalArgumentException("Warehouse entries cannot be null");
         }
     }
+/**
+ * Executes the throw if invalid operation.
+ *
+ * @param requests input value
+ */
 
     private void throwIfInvalid(List<WarehouseRequestDTO> requests) {
         List<WarehouseResponseDTO> invalid = requests.stream()

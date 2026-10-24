@@ -15,6 +15,8 @@ public class ProductMapper {
 
     /**
      * Returns the result of the to entity operation.
+ * @param requestDTO input value
+ * @return operation result
      */
     public ProductEntity toEntity(ProductRequestDTO requestDTO) {
 
@@ -37,6 +39,8 @@ public class ProductMapper {
 
     /**
      * Performs the update entity operation.
+ * @param product input value
+ * @param requestDTO input value
      */
     public void updateEntity(ProductEntity product, ProductRequestDTO requestDTO) {
 
@@ -55,6 +59,8 @@ public class ProductMapper {
 
     /**
      * Returns the result of the to response dto operation.
+ * @param product input value
+ * @return operation result
      */
     public ProductResponseDTO toResponseDTO(ProductEntity product) {
 
@@ -78,6 +84,8 @@ public class ProductMapper {
 
     /**
      * Returns the result of the to response dto operation.
+ * @param product input value
+ * @return operation result
      */
     public ProductResponseDTO toResponseDTO(ProductRequestDTO product) {
 

@@ -13,6 +13,8 @@ import java.util.ArrayList;
 public class InventoryMapper {
     /**
      * Returns the result of the to entity operation.
+ * @param request input value
+ * @return operation result
      */
     public InventoryEntity toEntity(InventoryRequestDTO request) {
         return InventoryEntity.builder()
@@ -22,6 +24,8 @@ public class InventoryMapper {
     }
     /**
      * Returns the result of the to response dto operation.
+ * @param entity input value
+ * @return operation result
      */
     public InventoryResponseDTO toResponseDTO(InventoryEntity entity) {
         return InventoryResponseDTO.builder().id(entity.getId()).productId(entity.getProductId())
@@ -32,6 +36,12 @@ public class InventoryMapper {
                 .isValid(true)
                 .build();
     }
+/**
+ * Executes the to response dto operation.
+ *
+ * @param request input value
+ * @return operation result
+ */
 
     public InventoryResponseDTO toResponseDTO(InventoryRequestDTO request) {
         return InventoryResponseDTO.builder()
