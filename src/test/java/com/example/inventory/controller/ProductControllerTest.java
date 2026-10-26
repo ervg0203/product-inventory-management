@@ -2,6 +2,8 @@ package com.example.inventory.controller;
 
 import com.example.inventory.config.PaginationProperties;
 import com.example.inventory.dto.common.PageResponseDTO;
+import com.example.inventory.dto.common.ProductSearchQueryDTO;
+import com.example.inventory.dto.common.SearchRequestDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.exception.GlobalExceptionHandler;
 import com.example.inventory.service.ProductService;
@@ -56,7 +58,7 @@ class ProductControllerTest {
                         .param("brands", "A,B").param("minPrice", "10")
                         .param("sortBy", "price").param("sortDirection", "DESC"))
                 .andExpect(status().isOk());
-        verify(productService).searchProducts(any(com.example.inventory.dto.common.ProductSearchQueryDTO.class));
+        verify(productService).searchProducts(any(ProductSearchQueryDTO.class));
 
         when(productParser.parse(any())).thenReturn(List.of());
         mvc.perform(multipart("/api/v1/products/import")
@@ -91,7 +93,7 @@ class ProductControllerTest {
         mvc.perform(delete("/api/v1/products/delete-by-filters").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"filters\":[]}")).andExpect(status().isOk());
         mvc.perform(delete("/api/v1/products/p1")).andExpect(status().isOk());
-        verify(productService).searchProducts(any(com.example.inventory.dto.common.SearchRequestDTO.class));
+        verify(productService).searchProducts(any(SearchRequestDTO.class));
         verify(productService).getProductById("p1");
         verify(productService).createProducts(anyList());
         verify(productService).updateProduct(any());

@@ -5,7 +5,10 @@ import com.example.inventory.dto.common.ErrorsDTO;
 import com.example.inventory.dto.response.ProductResponseDTO;
 import com.example.inventory.entity.ProductEntity;
 import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProductMapperTest {
@@ -28,7 +31,7 @@ class ProductMapperTest {
                 .title("T").description("D").category("C").price(new BigDecimal("1.00"))
                 .discountPercentage(new BigDecimal("2")).rating(new BigDecimal("4"))
                 .brand("B").returnPolicy("R").isValid(false)
-                .errors(java.util.List.of(ErrorsDTO.builder().field("sku").message("bad").build()))
+                .errors(List.of(ErrorsDTO.builder().field("sku").message("bad").build()))
                 .build();
         ProductEntity entity = mapper.toEntity(request);
         entity.setId("p");

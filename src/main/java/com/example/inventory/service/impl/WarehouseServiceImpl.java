@@ -27,6 +27,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import com.example.inventory.util.SearchQueryBuilder;
 import com.example.inventory.util.SearchCriteriaBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -228,8 +229,8 @@ public class WarehouseServiceImpl implements WarehouseService {
         if (importProperties.getBatchSize() < 1) {
             throw new IllegalArgumentException("Import batch size must be greater than zero");
         }
-        List<WarehouseResponseDTO> createdWarehouses = new java.util.ArrayList<>();
-        List<WarehouseResponseDTO> updatedWarehouses = new java.util.ArrayList<>();
+        List<WarehouseResponseDTO> createdWarehouses = new ArrayList<>();
+        List<WarehouseResponseDTO> updatedWarehouses = new ArrayList<>();
         for (int start = 0; start < creates.size(); start += importProperties.getBatchSize()) {
             int end = Math.min(start + importProperties.getBatchSize(), creates.size());
             createdWarehouses.addAll(createWarehouses(creates.subList(start, end)));

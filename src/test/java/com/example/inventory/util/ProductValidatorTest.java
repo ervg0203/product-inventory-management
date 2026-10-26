@@ -5,6 +5,7 @@ import com.example.inventory.dto.request.ProductRequestDTO;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,7 +23,7 @@ class ProductValidatorTest {
     void validatesValidProductAndResetsPreviousErrors() {
         ProductRequestDTO product = valid();
         product.setIsValid(false);
-        product.setErrors(java.util.List.of(ErrorsDTO.builder().field("old").message("old").build()));
+        product.setErrors(List.of(ErrorsDTO.builder().field("old").message("old").build()));
         validator.validate(product);
         assertTrue(product.getIsValid());
         assertTrue(product.getErrors().isEmpty());

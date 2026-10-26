@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -79,7 +80,7 @@ class ProductServiceImplTest {
         assertThrows(ProductValidationException.class, () -> service.createProducts(List.of(invalid)));
         verify(productRepository, never()).saveAll(any());
         assertThrows(IllegalArgumentException.class, () -> service.createProducts(List.of()));
-        assertThrows(IllegalArgumentException.class, () -> service.createProducts(java.util.Arrays.asList(invalid, null)));
+        assertThrows(IllegalArgumentException.class, () -> service.createProducts(Arrays.asList(invalid, null)));
     }
 
     @Test

@@ -2,6 +2,8 @@ package com.example.inventory.controller;
 
 import com.example.inventory.config.PaginationProperties;
 import com.example.inventory.dto.common.PageResponseDTO;
+import com.example.inventory.dto.common.SearchRequestDTO;
+import com.example.inventory.dto.common.WarehouseSearchQueryDTO;
 import com.example.inventory.dto.response.WarehouseResponseDTO;
 import com.example.inventory.exception.GlobalExceptionHandler;
 import com.example.inventory.service.WarehouseService;
@@ -36,12 +38,12 @@ class WarehouseControllerTest {
 
     @Test
     void searchesCreatesInBulkAndDeletesAllWarehouses() throws Exception {
-        when(warehouseService.searchWarehouses(any(com.example.inventory.dto.common.WarehouseSearchQueryDTO.class)))
+        when(warehouseService.searchWarehouses(any(WarehouseSearchQueryDTO.class)))
                 .thenReturn(PageResponseDTO.<WarehouseResponseDTO>builder().content(List.of()).build());
         mvc.perform(get("/api/v1/warehouses/search").param("query", "London")
                         .param("active", "true").param("codes", "W1,W2").param("size", "5"))
                 .andExpect(status().isOk());
-        verify(warehouseService).searchWarehouses(any(com.example.inventory.dto.common.WarehouseSearchQueryDTO.class));
+        verify(warehouseService).searchWarehouses(any(WarehouseSearchQueryDTO.class));
 
         mvc.perform(post("/api/v1/warehouses/create-multi")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -74,7 +76,7 @@ class WarehouseControllerTest {
                         .content("{\"filters\":[]}")).andExpect(status().isOk());
         mvc.perform(delete("/api/v1/warehouses/w1")).andExpect(status().isOk());
         verify(warehouseService).getAllWarehouses(1, 2);
-        verify(warehouseService).searchWarehouses(any(com.example.inventory.dto.common.SearchRequestDTO.class));
+        verify(warehouseService).searchWarehouses(any(SearchRequestDTO.class));
         verify(warehouseService).getWarehouseById("w1");
         verify(warehouseService).createWarehouse(any());
         verify(warehouseService).updateWarehouse(any());

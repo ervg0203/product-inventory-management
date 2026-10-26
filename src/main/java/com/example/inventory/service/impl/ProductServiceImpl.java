@@ -27,6 +27,7 @@ import com.example.inventory.enums.ProductField;
 import com.example.inventory.util.SearchQueryBuilder;
 import com.example.inventory.util.SearchCriteriaBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -263,8 +264,8 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Import batch size must be greater than zero");
         }
 
-        List<ProductResponseDTO> createdProducts = new java.util.ArrayList<>();
-        List<ProductResponseDTO> updatedProducts = new java.util.ArrayList<>();
+        List<ProductResponseDTO> createdProducts = new ArrayList<>();
+        List<ProductResponseDTO> updatedProducts = new ArrayList<>();
         for (int start = 0; start < creates.size(); start += importProperties.getBatchSize()) {
             int end = Math.min(start + importProperties.getBatchSize(), creates.size());
             createdProducts.addAll(createProducts(creates.subList(start, end)));

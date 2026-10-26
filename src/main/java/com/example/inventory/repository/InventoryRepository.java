@@ -2,7 +2,9 @@ package com.example.inventory.repository;
 
 import com.example.inventory.entity.InventoryEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import java.util.*;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface InventoryRepository extends MongoRepository<InventoryEntity, String> {
 /**

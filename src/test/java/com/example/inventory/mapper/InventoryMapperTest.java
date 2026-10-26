@@ -5,6 +5,9 @@ import com.example.inventory.dto.common.ErrorsDTO;
 import com.example.inventory.dto.response.InventoryResponseDTO;
 import com.example.inventory.entity.InventoryEntity;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class InventoryMapperTest {
@@ -23,7 +26,7 @@ class InventoryMapperTest {
     void mapsInvalidRequestResponseAndEntityMetadata() {
         InventoryRequestDTO request = InventoryRequestDTO.builder().id("i").productId("p")
                 .warehouseId("w").quantity(4).isValid(false)
-                .errors(java.util.List.of(ErrorsDTO.builder().field("quantity").message("bad").build()))
+                .errors(List.of(ErrorsDTO.builder().field("quantity").message("bad").build()))
                 .build();
         InventoryResponseDTO response = mapper.toResponseDTO(request);
         assertEquals("i", response.getId());

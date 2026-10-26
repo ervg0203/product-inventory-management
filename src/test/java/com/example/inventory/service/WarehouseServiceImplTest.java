@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -118,7 +119,7 @@ class WarehouseServiceImplTest {
         WarehouseServiceImpl service = service();
         assertThrows(IllegalArgumentException.class, () -> service.createWarehouses(null));
         assertThrows(IllegalArgumentException.class, () -> service.createWarehouses(List.of()));
-        assertThrows(IllegalArgumentException.class, () -> service.createWarehouses(java.util.Arrays.asList(null, WarehouseRequestDTO.builder().build())));
+        assertThrows(IllegalArgumentException.class, () -> service.createWarehouses(Arrays.asList(null, WarehouseRequestDTO.builder().build())));
         WarehouseRequestDTO invalid = WarehouseRequestDTO.builder().code("W").isValid(false).build();
         when(warehouseMapper.toResponseDTO(invalid)).thenReturn(WarehouseResponseDTO.builder().build());
         assertThrows(WarehouseValidationException.class, () -> service.createWarehouses(List.of(invalid)));

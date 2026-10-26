@@ -3,6 +3,8 @@ package com.example.inventory.util;
 import com.example.inventory.dto.common.*;
 import com.example.inventory.enums.*;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.mongodb.core.query.Query;
+
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -85,8 +87,7 @@ class SearchCriteriaBuilderTest {
 
     @Test
     void coversWarehouseKeywordCriteriaAndBooleanFilter() {
-        org.springframework.data.mongodb.core.query.Query query =
-                new org.springframework.data.mongodb.core.query.Query();
+        Query query = new Query();
         builder.addWarehouseKeywordCriteria(query, "A+B");
         assertFalse(query.getQueryObject().isEmpty());
         builder.addWarehouseKeywordCriteria(query, null);

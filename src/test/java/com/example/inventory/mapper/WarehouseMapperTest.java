@@ -4,6 +4,9 @@ import com.example.inventory.dto.request.WarehouseRequestDTO;
 import com.example.inventory.dto.common.ErrorsDTO;
 import com.example.inventory.entity.WarehouseEntity;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class WarehouseMapperTest {
@@ -22,7 +25,7 @@ class WarehouseMapperTest {
         WarehouseRequestDTO request = WarehouseRequestDTO.builder().id("w").code("W")
                 .name("Central").address("Main").city("London").state("LN")
                 .postalCode("E1").active(false).isValid(false)
-                .errors(java.util.List.of(ErrorsDTO.builder().field("code").message("bad").build()))
+                .errors(List.of(ErrorsDTO.builder().field("code").message("bad").build()))
                 .build();
         WarehouseEntity entity = mapper.toEntity(request);
         entity.setId("w");

@@ -22,6 +22,7 @@ import com.example.inventory.dto.common.ErrorsDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -29,8 +30,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -191,7 +192,7 @@ public class InventoryServiceImpl implements InventoryService {
                  */
                 new Update().set("quantity", request.getQuantity())
                         .set("updatedAt", LocalDateTime.now()),
-                org.springframework.data.mongodb.core.FindAndModifyOptions.options().returnNew(true),
+                FindAndModifyOptions.options().returnNew(true),
                 InventoryEntity.class);
         return inventoryMapper.toResponseDTO(updated);
     }
@@ -323,7 +324,7 @@ public class InventoryServiceImpl implements InventoryService {
  *
  * @param request input value
  * @param existing input value
- * @param String input value
+// * @param String input value
  */
 
     private void validateUpdateRequest(InventoryRequestDTO request,
