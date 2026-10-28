@@ -476,8 +476,10 @@ src/
 
 No license file is currently included in the repository.
 
-## API Documentation and Presentation Files
+## API Documentation, Presentation Files and Sample Import Data
 
-[Product-Inventory-Management-System.pptx](../Product-Inventory-Management-System.pptx)
+They are available in the `docs` folder. 
 
-[PRODUCT INVENTORY MANAGEMENT SYSTEM_3562.docx](../PRODUCT%20INVENTORY%20MANAGEMENT%20SYSTEM_3562.docx)
+The presentation file is `Product-Inventory-Management-System.pptx`. 
+The documentation file is `PRODUCT INVENTORY MANAGEMENT SYSTEM.docx`.
+The sample import data files for products are also available in the `docs` folder.
