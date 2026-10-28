@@ -474,4 +474,10 @@ src/
 
 ## License
 
-No license file is currently included in the repository. Add a license before distributing the project publicly.
+No license file is currently included in the repository.
+
+## API Documentation and Presentation Files
+
+[Product-Inventory-Management-System.pptx](../Product-Inventory-Management-System.pptx)
+
+[PRODUCT INVENTORY MANAGEMENT SYSTEM_3562.docx](../PRODUCT%20INVENTORY%20MANAGEMENT%20SYSTEM_3562.docx)
