@@ -52,13 +52,13 @@ public class ProductController {
  * @param size input value
  * @return operation result
      */
-    public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> getAllProducts(
+    public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> getAllProducts(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products fetched successfully",
-                productService.getAllProducts(
-                        page == null ? paginationProperties.getDefaultPage() : page,
-                        size == null ? paginationProperties.getDefaultPageSize() : size)));
+        PageResponseDTO<ProductResponseDTO> response = productService.getAllProducts(
+                page == null ? paginationProperties.getDefaultPage() : page,
+                size == null ? paginationProperties.getDefaultPageSize() : size);
+        return paginatedResponse("Products fetched successfully", response);
     }
 
     @PostMapping("/advance-search")
@@ -74,10 +74,9 @@ public class ProductController {
  * @param request input value
  * @return operation result
      */
-    public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> searchProducts(
+    public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> searchProducts(
             @RequestBody SearchRequestDTO<ProductField> request) {
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products searched successfully",
-                productService.searchProducts(request)));
+        return paginatedResponse("Products searched successfully", productService.searchProducts(request));
     }
 
     @GetMapping("/search")
@@ -123,7 +122,7 @@ public class ProductController {
      * @param sortDirection sort direction
      * @return paginated matching products
      */
-    public ResponseEntity<ApiResponseDTO<PageResponseDTO<ProductResponseDTO>>> searchProductsByQuery(
+    public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> searchProductsByQuery(
             @Parameter(description = "Keyword across title, description, SKU, brand, and category.",
                     example = "phone")
             @RequestParam(required = false) String query,
@@ -217,8 +216,19 @@ public class ProductController {
         request.setSize(size);
         request.setSortBy(sortBy);
         request.setSortDirection(sortDirection);
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products searched successfully",
-                productService.searchProducts(request)));
+        return paginatedResponse("Products searched successfully", productService.searchProducts(request));
+    }
+
+    private ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> paginatedResponse(
+            String message, PageResponseDTO<ProductResponseDTO> page) {
+        return ResponseEntity.ok()
+                .header("Total-Records", String.valueOf(page.getTotalRecords()))
+                .header("Page", String.valueOf(page.getPage()))
+                .header("Page-Size", String.valueOf(page.getPageSize()))
+                .header("Total-Pages", String.valueOf(page.getTotalPages()))
+                .header("First", String.valueOf(page.isFirst()))
+                .header("Last", String.valueOf(page.isLast()))
+                .body(new ApiResponseDTO<>(true, message, page.getContent()));
     }
 
     @GetMapping("/{id}")

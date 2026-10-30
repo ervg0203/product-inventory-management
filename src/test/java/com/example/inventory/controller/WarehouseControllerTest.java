@@ -58,6 +58,10 @@ class WarehouseControllerTest {
 
     @Test
     void coversRemainingWarehouseEndpoints() throws Exception {
+        when(warehouseService.getAllWarehouses(anyInt(), anyInt()))
+                .thenReturn(PageResponseDTO.<WarehouseResponseDTO>builder().content(List.of()).build());
+        when(warehouseService.searchWarehouses(any(SearchRequestDTO.class)))
+                .thenReturn(PageResponseDTO.<WarehouseResponseDTO>builder().content(List.of()).build());
         mvc.perform(get("/api/v1/warehouses").param("page", "1").param("size", "2"))
                 .andExpect(status().isOk());
         mvc.perform(post("/api/v1/warehouses/advance-search").contentType(MediaType.APPLICATION_JSON)

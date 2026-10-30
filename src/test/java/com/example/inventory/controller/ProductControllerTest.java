@@ -46,7 +46,13 @@ class ProductControllerTest {
         when(productService.getAllProducts(0, 20)).thenReturn(page);
         mvc.perform(get("/api/v1/products")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.page").value(0));
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(header().string("Total-Records", "0"))
+                .andExpect(header().string("Page", "0"))
+                .andExpect(header().string("Page-Size", "20"))
+                .andExpect(header().string("Total-Pages", "0"))
+                .andExpect(header().string("First", "true"))
+                .andExpect(header().string("Last", "true"));
         verify(productService).getAllProducts(0, 20);
 
         mvc.perform(post("/api/v1/products/create").contentType(MediaType.APPLICATION_JSON)
@@ -54,6 +60,8 @@ class ProductControllerTest {
                 .andExpect(status().isCreated());
         verify(productService).createProduct(any());
 
+        when(productService.searchProducts(any(ProductSearchQueryDTO.class)))
+                .thenReturn(PageResponseDTO.<ProductResponseDTO>builder().content(List.of()).build());
         mvc.perform(get("/api/v1/products/search").param("query", "phone")
                         .param("brands", "A,B").param("minPrice", "10")
                         .param("sortBy", "price").param("sortDirection", "DESC"))
@@ -80,6 +88,8 @@ class ProductControllerTest {
 
     @Test
     void coversRemainingProductEndpoints() throws Exception {
+        when(productService.searchProducts(any(SearchRequestDTO.class)))
+                .thenReturn(PageResponseDTO.<ProductResponseDTO>builder().content(List.of()).build());
         mvc.perform(post("/api/v1/products/advance-search").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"filters\":[]}")).andExpect(status().isOk());
         mvc.perform(get("/api/v1/products/p1")).andExpect(status().isOk());

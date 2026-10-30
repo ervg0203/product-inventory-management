@@ -52,13 +52,13 @@ public class WarehouseController {
  * @param size input value
  * @return operation result
      */
-    public ResponseEntity<ApiResponseDTO<PageResponseDTO<WarehouseResponseDTO>>> getAllWarehouses(
+    public ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> getAllWarehouses(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses fetched successfully",
-                warehouseService.getAllWarehouses(
-                        page == null ? paginationProperties.getDefaultPage() : page,
-                        size == null ? paginationProperties.getDefaultPageSize() : size)));
+        PageResponseDTO<WarehouseResponseDTO> response = warehouseService.getAllWarehouses(
+                page == null ? paginationProperties.getDefaultPage() : page,
+                size == null ? paginationProperties.getDefaultPageSize() : size);
+        return paginatedResponse("Warehouses fetched successfully", response);
     }
 
     @PostMapping("/advance-search")
@@ -76,10 +76,9 @@ public class WarehouseController {
  * @param request input value
  * @return operation result
  */
-    public ResponseEntity<ApiResponseDTO<PageResponseDTO<WarehouseResponseDTO>>> searchWarehouses(
+    public ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> searchWarehouses(
             @RequestBody SearchRequestDTO<WarehouseField> request) {
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses searched successfully",
-                warehouseService.searchWarehouses(request)));
+        return paginatedResponse("Warehouses searched successfully", warehouseService.searchWarehouses(request));
     }
 
     @GetMapping("/search")
@@ -107,7 +106,7 @@ public class WarehouseController {
      * @param sortDirection sort direction
      * @return paginated matching warehouses
      */
-    public ResponseEntity<ApiResponseDTO<PageResponseDTO<WarehouseResponseDTO>>> searchWarehousesByQuery(
+    public ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> searchWarehousesByQuery(
             @Parameter(description = "Keyword across code, name, address, city, state, and postal code.",
                     example = "London")
             @RequestParam(required = false) String query,
@@ -160,8 +159,19 @@ public class WarehouseController {
         request.setSize(size);
         request.setSortBy(sortBy);
         request.setSortDirection(sortDirection);
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses searched successfully",
-                warehouseService.searchWarehouses(request)));
+        return paginatedResponse("Warehouses searched successfully", warehouseService.searchWarehouses(request));
+    }
+
+    private ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> paginatedResponse(
+            String message, PageResponseDTO<WarehouseResponseDTO> page) {
+        return ResponseEntity.ok()
+                .header("Total-Records", String.valueOf(page.getTotalRecords()))
+                .header("Page", String.valueOf(page.getPage()))
+                .header("Page-Size", String.valueOf(page.getPageSize()))
+                .header("Total-Pages", String.valueOf(page.getTotalPages()))
+                .header("First", String.valueOf(page.isFirst()))
+                .header("Last", String.valueOf(page.isLast()))
+                .body(new ApiResponseDTO<>(true, message, page.getContent()));
     }
 
     @GetMapping("/{id}")
