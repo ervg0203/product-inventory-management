@@ -171,7 +171,7 @@ public class WarehouseController {
                 .header("Total-Pages", String.valueOf(page.getTotalPages()))
                 .header("First", String.valueOf(page.isFirst()))
                 .header("Last", String.valueOf(page.isLast()))
-                .body(new ApiResponseDTO<>(true, message, page.getContent()));
+                .body(new ApiResponseDTO<>(true, message, page.getContent(), "warehouses"));
     }
 
     @GetMapping("/{id}")
@@ -190,7 +190,7 @@ public class WarehouseController {
      */
     public ResponseEntity<ApiResponseDTO<WarehouseResponseDTO>> getWarehouseById(@PathVariable String id) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouse fetched successfully",
-                warehouseService.getWarehouseById(id)));
+                warehouseService.getWarehouseById(id), "warehouse"));
     }
 
     @PostMapping("/create")
@@ -213,7 +213,7 @@ public class WarehouseController {
             @RequestBody WarehouseRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseDTO<>(true, "Warehouse created successfully",
-                        warehouseService.createWarehouse(request)));
+                        warehouseService.createWarehouse(request), "warehouse"));
     }
 
     @PostMapping("/create-multi")
@@ -236,7 +236,7 @@ public class WarehouseController {
             @RequestBody List<WarehouseRequestDTO> requests) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseDTO<>(true, "Warehouses created successfully",
-                        warehouseService.createWarehouses(requests)));
+                        warehouseService.createWarehouses(requests), "warehouses"));
     }
 
     @PutMapping("/update")
@@ -259,7 +259,7 @@ public class WarehouseController {
     public ResponseEntity<ApiResponseDTO<WarehouseResponseDTO>> updateWarehouse(
             @RequestBody WarehouseRequestDTO request) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouse updated successfully",
-                warehouseService.updateWarehouse(request)));
+                warehouseService.updateWarehouse(request), "warehouse"));
     }
 
     @PutMapping("/update-multi")
@@ -282,7 +282,7 @@ public class WarehouseController {
     public ResponseEntity<ApiResponseDTO<List<WarehouseResponseDTO>>> updateWarehouses(
             @RequestBody List<WarehouseRequestDTO> requests) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses updated successfully",
-                warehouseService.updateWarehouses(requests)));
+                warehouseService.updateWarehouses(requests), "warehouses"));
     }
 
     @PostMapping(value = "/import", consumes = "multipart/form-data")
@@ -304,7 +304,7 @@ public class WarehouseController {
     public ResponseEntity<ApiResponseDTO<ImportResponseDTO<WarehouseResponseDTO>>> importWarehouses(
             @RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouses imported successfully",
-                warehouseService.importWarehouses(warehouseExcelParser.parse(file))));
+                warehouseService.importWarehouses(warehouseExcelParser.parse(file)), "warehouses"));
     }
 
     @DeleteMapping("/delete-all")

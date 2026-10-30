@@ -228,7 +228,7 @@ public class ProductController {
                 .header("Total-Pages", String.valueOf(page.getTotalPages()))
                 .header("First", String.valueOf(page.isFirst()))
                 .header("Last", String.valueOf(page.isLast()))
-                .body(new ApiResponseDTO<>(true, message, page.getContent()));
+                .body(new ApiResponseDTO<>(true, message, page.getContent(), "products"));
     }
 
     @GetMapping("/{id}")
@@ -248,7 +248,7 @@ public class ProductController {
     public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> getProductById(
             @PathVariable String id) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Product fetched successfully",
-                productService.getProductById(id)));
+                productService.getProductById(id), "product"));
     }
 
     @PostMapping("/create")
@@ -271,7 +271,7 @@ public class ProductController {
             @RequestBody ProductRequestDTO productRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseDTO<>(true, "Product created successfully",
-                        productService.createProduct(productRequestDTO)));
+                        productService.createProduct(productRequestDTO), "product"));
     }
 
     @PostMapping("/create-multi")
@@ -294,7 +294,7 @@ public class ProductController {
             @RequestBody List<ProductRequestDTO> productRequestDTOs) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseDTO<>(true, "Products created successfully",
-                        productService.createProducts(productRequestDTOs)));
+                        productService.createProducts(productRequestDTOs), "products"));
     }
 
     @PutMapping("/update")
@@ -317,7 +317,7 @@ public class ProductController {
     public ResponseEntity<ApiResponseDTO<ProductResponseDTO>> updateProducts(
             @RequestBody ProductRequestDTO productRequestDTOs) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Product updated successfully",
-                productService.updateProduct(productRequestDTOs)));
+                productService.updateProduct(productRequestDTOs), "product"));
     }
 
     @PutMapping("/update-multi")
@@ -340,7 +340,7 @@ public class ProductController {
     public ResponseEntity<ApiResponseDTO<List<ProductResponseDTO>>> updateProducts(
             @RequestBody List<ProductRequestDTO> productRequestDTOs) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products updated successfully",
-                productService.updateProducts(productRequestDTOs)));
+                productService.updateProducts(productRequestDTOs), "products"));
     }
 
     @PostMapping(value = "/import", consumes = "multipart/form-data")
@@ -362,7 +362,7 @@ public class ProductController {
     public ResponseEntity<ApiResponseDTO<ImportResponseDTO<ProductResponseDTO>>> importProducts(
             @RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Products imported successfully",
-                productService.importProducts(productExcelParser.parse(file))));
+                productService.importProducts(productExcelParser.parse(file)), "products"));
     }
 
     @DeleteMapping("/delete-all")

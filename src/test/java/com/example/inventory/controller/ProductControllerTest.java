@@ -46,7 +46,8 @@ class ProductControllerTest {
         when(productService.getAllProducts(0, 20)).thenReturn(page);
         mvc.perform(get("/api/v1/products")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.products").isArray())
+                .andExpect(jsonPath("$.data").doesNotExist())
                 .andExpect(header().string("Total-Records", "0"))
                 .andExpect(header().string("Page", "0"))
                 .andExpect(header().string("Page-Size", "20"))

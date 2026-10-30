@@ -63,7 +63,9 @@ class WarehouseControllerTest {
         when(warehouseService.searchWarehouses(any(SearchRequestDTO.class)))
                 .thenReturn(PageResponseDTO.<WarehouseResponseDTO>builder().content(List.of()).build());
         mvc.perform(get("/api/v1/warehouses").param("page", "1").param("size", "2"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.warehouses").isArray())
+                .andExpect(jsonPath("$.data").doesNotExist());
         mvc.perform(post("/api/v1/warehouses/advance-search").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"filters\":[]}")).andExpect(status().isOk());
         mvc.perform(get("/api/v1/warehouses/w1")).andExpect(status().isOk());

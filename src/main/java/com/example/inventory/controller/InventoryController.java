@@ -49,7 +49,7 @@ public class InventoryController {
             @Valid @RequestBody InventoryRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseDTO<>(true, "Inventory created successfully",
-                        inventoryService.createInventory(request)));
+                        inventoryService.createInventory(request), "inventory"));
     }
 
     @PostMapping("/create-multi")
@@ -65,7 +65,7 @@ public class InventoryController {
             @RequestBody List<InventoryRequestDTO> requests) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseDTO<>(true, "Inventory records created successfully",
-                        inventoryService.createInventories(requests)));
+                        inventoryService.createInventories(requests), "inventories"));
     }
 
     @PutMapping("/update-multi")
@@ -80,7 +80,7 @@ public class InventoryController {
     public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> updateInventories(
             @RequestBody List<InventoryRequestDTO> requests) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Inventory records updated successfully",
-                inventoryService.updateInventories(requests)));
+                inventoryService.updateInventories(requests), "inventories"));
     }
 
     @GetMapping("/{inventoryId}")
@@ -99,7 +99,7 @@ public class InventoryController {
     public ResponseEntity<ApiResponseDTO<InventoryResponseDTO>> getInventory(
             @PathVariable String inventoryId) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Inventory fetched successfully",
-                inventoryService.getInventoryById(inventoryId)));
+                inventoryService.getInventoryById(inventoryId), "inventory"));
     }
 
     @GetMapping("/products/{productId}")
@@ -119,7 +119,7 @@ public class InventoryController {
     public ResponseEntity<ApiResponseDTO<ProductStockResponseDTO>> getProductStock(
             @PathVariable String productId) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Product stock fetched successfully",
-                inventoryService.getProductStock(productId)));
+                inventoryService.getProductStock(productId), "productStock"));
     }
 
     @GetMapping("/warehouses/{warehouseId}")
@@ -139,7 +139,7 @@ public class InventoryController {
     public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> getWarehouseInventory(
             @PathVariable String warehouseId) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Warehouse inventory fetched successfully",
-                inventoryService.getWarehouseInventory(warehouseId)));
+                inventoryService.getWarehouseInventory(warehouseId), "inventories"));
     }
 
     @PutMapping("/{inventoryId}/stock")
@@ -163,7 +163,7 @@ public class InventoryController {
             @PathVariable String inventoryId,
             @Valid @RequestBody SetStockRequestDTO request) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Stock updated successfully",
-                inventoryService.setStock(inventoryId, request)));
+                inventoryService.setStock(inventoryId, request), "inventory"));
     }
 
     @PatchMapping("/{inventoryId}/stock/increase")
@@ -187,7 +187,7 @@ public class InventoryController {
             @PathVariable String inventoryId,
             @Valid @RequestBody StockAdjustmentRequestDTO request) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Stock increased successfully",
-                inventoryService.increaseStock(inventoryId, request)));
+                inventoryService.increaseStock(inventoryId, request), "inventory"));
     }
 
     @PatchMapping("/{inventoryId}/stock/decrease")
@@ -211,7 +211,7 @@ public class InventoryController {
             @PathVariable String inventoryId,
             @Valid @RequestBody StockAdjustmentRequestDTO request) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Stock decreased successfully",
-                inventoryService.decreaseStock(inventoryId, request)));
+                inventoryService.decreaseStock(inventoryId, request), "inventory"));
     }
 
     @GetMapping("/low-stock")
@@ -234,7 +234,7 @@ public class InventoryController {
             @RequestParam int threshold,
             @RequestParam(required = false) String warehouseId) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Low-stock inventory fetched successfully",
-                inventoryService.getLowStock(threshold, warehouseId)));
+                inventoryService.getLowStock(threshold, warehouseId), "inventories"));
     }
 
     @DeleteMapping("/{inventoryId}")

@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
                                 .totalErrors(exception.getTotalErrors())
                                 .totalIncorrectDtos(exception.getTotalIncorrectDtos())
                                 .incorrectDtos(exception.getProducts())
-                                .build()));
+                                .build(), "products"));
     }
 
     @ExceptionHandler(WarehouseValidationException.class)
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
                                 .totalErrors(exception.getTotalErrors())
                                 .totalIncorrectDtos(exception.getTotalIncorrectDtos())
                                 .incorrectDtos(exception.getWarehouses())
-                                .build()));
+                                .build(), "warehouses"));
     }
 /**
  * Executes the handle inventory validation operation.
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseDTO<List<InventoryResponseDTO>>> handleInventoryValidation(
             InventoryValidationException exception) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ApiResponseDTO<>(false, exception.getMessage(), exception.getInventories()));
+                .body(new ApiResponseDTO<>(false, exception.getMessage(), exception.getInventories(), "inventories"));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
