@@ -4,6 +4,7 @@ import com.example.inventory.dto.common.ErrorsDTO;
 import com.example.inventory.enums.ErrorMessage;
 import com.example.inventory.enums.ProductField;
 import com.example.inventory.dto.request.ProductRequestDTO;
+import com.example.inventory.entity.ProductEntity;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -57,6 +58,13 @@ public final class ProductValidator {
         if (product.getSku() != null && !product.getSku().isBlank()
                 && (existingProductSkus == null || !existingProductSkus.contains(product.getSku()))) {
             addError(product, ErrorMessage.NOT_FOUND, ProductField.SKU);
+        }
+    }
+
+    public void validateIdentifierMatches(ProductRequestDTO product, ProductEntity existingProduct) {
+        if (product != null && product.getId() != null && !product.getId().isBlank()
+                && existingProduct != null && !product.getId().equals(existingProduct.getId())) {
+            addError(product, ErrorMessage.MISMATCH, ProductField.SKU, "id");
         }
     }
 /**

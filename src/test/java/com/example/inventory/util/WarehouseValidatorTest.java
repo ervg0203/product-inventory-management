@@ -1,6 +1,7 @@
 package com.example.inventory.util;
 
 import com.example.inventory.dto.request.WarehouseRequestDTO;
+import com.example.inventory.entity.WarehouseEntity;
 import org.junit.jupiter.api.Test;
 import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,5 +44,17 @@ class WarehouseValidatorTest {
                 .filter(error -> "code".equals(error.getField())
                         && "Warehouse code is required".equals(error.getMessage()))
                 .count());
+    }
+
+    @Test
+    void rejectsIdThatDoesNotMatchCode() {
+        WarehouseRequestDTO warehouse = valid();
+        warehouse.setId("warehouse-a");
+
+        validator.validateIdentifierMatches(warehouse,
+                WarehouseEntity.builder().id("warehouse-b").code("WH-1").build());
+
+        assertFalse(warehouse.getIsValid());
+        assertEquals("code", warehouse.getErrors().getLast().getField());
     }
 }

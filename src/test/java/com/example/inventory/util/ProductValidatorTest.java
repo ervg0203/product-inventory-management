@@ -2,6 +2,7 @@ package com.example.inventory.util;
 
 import com.example.inventory.dto.common.ErrorsDTO;
 import com.example.inventory.dto.request.ProductRequestDTO;
+import com.example.inventory.entity.ProductEntity;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -67,5 +68,17 @@ class ProductValidatorTest {
     @Test
     void nullIsIgnored() {
         assertDoesNotThrow(() -> validator.validate(null));
+    }
+
+    @Test
+    void rejectsIdThatDoesNotMatchSku() {
+        ProductRequestDTO product = valid();
+        product.setId("product-a");
+
+        validator.validateIdentifierMatches(product,
+                ProductEntity.builder().id("product-b").sku("SKU-1").build());
+
+        assertFalse(product.getIsValid());
+        assertEquals("sku", product.getErrors().getLast().getField());
     }
 }

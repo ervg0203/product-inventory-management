@@ -133,6 +133,10 @@ class InventoryServiceImplTest {
         InventoryRequestDTO missing = request(); missing.setId("missing");
         when(inventoryRepository.findAllById(Set.of("missing"))).thenReturn(List.of());
         assertThrows(InventoryValidationException.class, () -> service.updateInventories(List.of(missing)));
+        InventoryRequestDTO duplicate = request();
+        duplicate.setId("i");
+        assertThrows(IllegalArgumentException.class,
+                () -> service.updateInventories(List.of(update, duplicate)));
         InventoryRequestDTO blank = request();
         assertThrows(InventoryValidationException.class, () -> service.updateInventories(List.of(blank)));
     }

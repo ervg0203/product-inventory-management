@@ -26,6 +26,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import com.example.inventory.util.SearchQueryBuilder;
 import com.example.inventory.util.SearchCriteriaBuilder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,6 +156,7 @@ public class WarehouseServiceImpl implements WarehouseService {
  * @param request input value
  * @return operation result
      */
+    @Transactional
     public WarehouseResponseDTO createWarehouse(WarehouseRequestDTO request) {
         return createWarehouses(List.of(request)).getFirst();
     }
@@ -165,8 +167,20 @@ public class WarehouseServiceImpl implements WarehouseService {
  * @param requests input value
  * @return operation result
      */
+    @Transactional
     public List<WarehouseResponseDTO> createWarehouses(List<WarehouseRequestDTO> requests) {
         validateRequests(requests);
+        validateUniqueCodes(requests);
+        Set<String> requestedCodes = requests.stream()
+                .map(WarehouseRequestDTO::getCode)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Set<String> existingCodes = warehouseRepository.findAllByCodeIn(requestedCodes).stream()
+                .map(WarehouseEntity::getCode)
+                .collect(Collectors.toSet());
+        if (!existingCodes.isEmpty()) {
+            throw new IllegalArgumentException("Warehouse code values already exist: " + existingCodes);
+        }
         requests.forEach(warehouseValidator::validate);
         throwIfInvalid(requests);
         return warehouseRepository.saveAll(requests.stream().map(warehouseMapper::toEntity).toList())
@@ -179,6 +193,7 @@ public class WarehouseServiceImpl implements WarehouseService {
  * @param request input value
  * @return operation result
      */
+    @Transactional
     public WarehouseResponseDTO updateWarehouse(WarehouseRequestDTO request) {
         return updateWarehouses(List.of(request)).getFirst();
     }
@@ -189,13 +204,17 @@ public class WarehouseServiceImpl implements WarehouseService {
  * @param requests input value
  * @return operation result
      */
+    @Transactional
     public List<WarehouseResponseDTO> updateWarehouses(List<WarehouseRequestDTO> requests) {
         validateRequests(requests);
+        validateUniqueCodes(requests);
         Set<String> codes = requests.stream().map(WarehouseRequestDTO::getCode)
                 .filter(Objects::nonNull).collect(Collectors.toSet());
         Map<String, WarehouseEntity> existing = warehouseRepository.findAllByCodeIn(codes).stream()
                 .collect(Collectors.toMap(WarehouseEntity::getCode, warehouse -> warehouse));
         requests.forEach(request -> warehouseValidator.validateForUpdate(request, existing.keySet()));
+        requests.forEach(request ->
+                warehouseValidator.validateIdentifierMatches(request, existing.get(request.getCode())));
         throwIfInvalid(requests);
         requests.forEach(request -> warehouseMapper.updateEntity(existing.get(request.getCode()), request));
         return warehouseRepository.saveAll(requests.stream()
@@ -210,8 +229,10 @@ public class WarehouseServiceImpl implements WarehouseService {
  */
 
     @Override
+    @Transactional
     public ImportResponseDTO<WarehouseResponseDTO> importWarehouses(List<WarehouseRequestDTO> warehouses) {
         validateRequests(warehouses);
+        validateImportIdentifiers(warehouses);
         Set<String> codes = warehouses.stream().map(WarehouseRequestDTO::getCode)
                 .filter(Objects::nonNull).collect(Collectors.toSet());
         Map<String, WarehouseEntity> existing = warehouseRepository.findAllByCodeIn(codes).stream()
@@ -224,6 +245,8 @@ public class WarehouseServiceImpl implements WarehouseService {
         creates.forEach(warehouseValidator::validate);
         updates.forEach(warehouse ->
                 warehouseValidator.validateForUpdate(warehouse, existing.keySet()));
+        updates.forEach(warehouse ->
+                warehouseValidator.validateIdentifierMatches(warehouse, existing.get(warehouse.getCode())));
         throwIfInvalid(warehouses);
 
         if (importProperties.getBatchSize() < 1) {
@@ -245,11 +268,21 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .build();
     }
 
+    private void validateImportIdentifiers(List<WarehouseRequestDTO> warehouses) {
+        boolean hasIdWithoutCode = warehouses.stream().anyMatch(warehouse ->
+                warehouse.getId() != null && !warehouse.getId().isBlank()
+                        && (warehouse.getCode() == null || warehouse.getCode().isBlank()));
+        if (hasIdWithoutCode) {
+            throw new IllegalArgumentException("Code is required when ID is supplied for import");
+        }
+    }
+
     @Override
     /**
      * Performs the delete warehouse operation.
  * @param id input value
      */
+    @Transactional
     public void deleteWarehouse(String id) {
         if (!warehouseRepository.existsById(id)) {
             throw new WarehouseNotFoundException(id);
@@ -265,6 +298,7 @@ public class WarehouseServiceImpl implements WarehouseService {
  */
 
     @Override
+    @Transactional
     public void deleteWarehousesByFilters(SearchRequestDTO<WarehouseField> request) {
         if (request == null || request.getFilters() == null || request.getFilters().isEmpty()) {
             throw new IllegalArgumentException("At least one filter is required");
@@ -284,6 +318,7 @@ public class WarehouseServiceImpl implements WarehouseService {
      * Performs the delete all warehouses operation.
  * @param requests input value
      */
+    @Transactional
     public void deleteAllWarehouses() {
         inventoryRepository.deleteAll();
         warehouseRepository.deleteAll();
@@ -296,6 +331,18 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
         if (requests.stream().anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("Warehouse entries cannot be null");
+        }
+    }
+
+    private void validateUniqueCodes(List<WarehouseRequestDTO> requests) {
+        Set<String> seenCodes = new java.util.HashSet<>();
+        Set<String> duplicateCodes = requests.stream()
+                .map(WarehouseRequestDTO::getCode)
+                .filter(Objects::nonNull)
+                .filter(code -> !seenCodes.add(code))
+                .collect(Collectors.toSet());
+        if (!duplicateCodes.isEmpty()) {
+            throw new IllegalArgumentException("Duplicate warehouse code values in request: " + duplicateCodes);
         }
     }
 /**

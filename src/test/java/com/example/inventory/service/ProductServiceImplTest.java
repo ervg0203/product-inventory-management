@@ -155,6 +155,11 @@ class ProductServiceImplTest {
         assertThrows(ProductValidationException.class, () -> service.updateProducts(List.of(unknown)));
         when(importProperties.getBatchSize()).thenReturn(0);
         assertThrows(IllegalArgumentException.class, () -> service.importProducts(List.of(create)));
+        ProductRequestDTO idOnly = ProductRequestDTO.builder().id("p").isValid(true).build();
+        assertThrows(IllegalArgumentException.class, () -> service.importProducts(List.of(idOnly)));
+        ProductRequestDTO duplicate = ProductRequestDTO.builder().sku("DUP").isValid(true).build();
+        assertThrows(IllegalArgumentException.class,
+                () -> service.updateProducts(List.of(duplicate, duplicate)));
     }
 
     @Test

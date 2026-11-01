@@ -2,6 +2,7 @@ package com.example.inventory.util;
 
 import com.example.inventory.dto.common.ErrorsDTO;
 import com.example.inventory.dto.request.WarehouseRequestDTO;
+import com.example.inventory.entity.WarehouseEntity;
 import com.example.inventory.enums.ErrorMessage;
 import com.example.inventory.enums.WarehouseField;
 import org.springframework.stereotype.Component;
@@ -46,6 +47,14 @@ public class WarehouseValidator {
         if (warehouse.getCode() != null && !warehouse.getCode().isBlank()
                 && (existingCodes == null || !existingCodes.contains(warehouse.getCode()))) {
             addError(warehouse, ErrorMessage.NOT_FOUND, WarehouseField.CODE);
+        }
+    }
+
+    public void validateIdentifierMatches(WarehouseRequestDTO warehouse,
+                                          WarehouseEntity existingWarehouse) {
+        if (warehouse != null && warehouse.getId() != null && !warehouse.getId().isBlank()
+                && existingWarehouse != null && !warehouse.getId().equals(existingWarehouse.getId())) {
+            addError(warehouse, ErrorMessage.MISMATCH, WarehouseField.CODE, "id");
         }
     }
 /**

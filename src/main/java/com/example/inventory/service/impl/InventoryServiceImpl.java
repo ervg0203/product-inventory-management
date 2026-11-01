@@ -28,6 +28,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class InventoryServiceImpl implements InventoryService {
  * @param request input value
  * @return operation result
      */
+    @Transactional
     public InventoryResponseDTO createInventory(InventoryRequestDTO request) {
         requireProduct(request.getProductId());
         requireActiveWarehouse(request.getWarehouseId());
@@ -83,8 +85,10 @@ public class InventoryServiceImpl implements InventoryService {
  */
 
     @Override
+    @Transactional
     public List<InventoryResponseDTO> createInventories(List<InventoryRequestDTO> requests) {
         validateRequests(requests);
+        validateUniqueProductWarehousePairs(requests);
         requests.forEach(this::validateCreateRequest);
         throwIfInvalid(requests);
 
@@ -106,8 +110,10 @@ public class InventoryServiceImpl implements InventoryService {
  */
 
     @Override
+    @Transactional
     public List<InventoryResponseDTO> updateInventories(List<InventoryRequestDTO> requests) {
         validateRequests(requests);
+        validateUniqueInventoryIds(requests);
         Set<String> ids = requests.stream().map(InventoryRequestDTO::getId)
                 .filter(Objects::nonNull).collect(Collectors.toSet());
         Map<String, InventoryEntity> existing = inventoryRepository.findAllById(ids).stream()
@@ -304,6 +310,30 @@ public class InventoryServiceImpl implements InventoryService {
             request.setErrors(new ArrayList<>());
             request.setIsValid(true);
         });
+    }
+
+    private void validateUniqueProductWarehousePairs(List<InventoryRequestDTO> requests) {
+        Set<String> seenPairs = new java.util.HashSet<>();
+        Set<String> duplicatePairs = requests.stream()
+                .map(request -> request.getProductId() + "\u0000" + request.getWarehouseId())
+                .filter(pair -> !seenPairs.add(pair))
+                .collect(Collectors.toSet());
+        if (!duplicatePairs.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Duplicate product and warehouse pairs in request: " + duplicatePairs);
+        }
+    }
+
+    private void validateUniqueInventoryIds(List<InventoryRequestDTO> requests) {
+        Set<String> seenIds = new java.util.HashSet<>();
+        Set<String> duplicateIds = requests.stream()
+                .map(InventoryRequestDTO::getId)
+                .filter(Objects::nonNull)
+                .filter(id -> !seenIds.add(id))
+                .collect(Collectors.toSet());
+        if (!duplicateIds.isEmpty()) {
+            throw new IllegalArgumentException("Duplicate inventory IDs in request: " + duplicateIds);
+        }
     }
 /**
  * Executes the validate create request operation.

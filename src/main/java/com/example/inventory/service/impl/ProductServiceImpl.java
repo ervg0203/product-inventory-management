@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.transaction.annotation.Transactional;
 import com.example.inventory.dto.common.SearchRequestDTO;
 import com.example.inventory.dto.common.ProductSearchQueryDTO;
 import com.example.inventory.enums.ProductField;
@@ -158,6 +159,7 @@ public class ProductServiceImpl implements ProductService {
  * @param productRequestDTO input value
  * @return operation result
      */
+    @Transactional
     public ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) {
         return createProducts(List.of(productRequestDTO)).getFirst();
     }
@@ -168,10 +170,22 @@ public class ProductServiceImpl implements ProductService {
  * @param productRequestDTOs input value
  * @return operation result
      */
+    @Transactional
     public List<ProductResponseDTO> createProducts(
             List<ProductRequestDTO> productRequestDTOs) {
 
         validateProductRequests(productRequestDTOs);
+        validateUniqueSkus(productRequestDTOs);
+        Set<String> requestedSkus = productRequestDTOs.stream()
+                .map(ProductRequestDTO::getSku)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Set<String> existingSkus = productRepository.findAllBySkuIn(requestedSkus).stream()
+                .map(ProductEntity::getSku)
+                .collect(Collectors.toSet());
+        if (!existingSkus.isEmpty()) {
+            throw new IllegalArgumentException("Product SKU values already exist: " + existingSkus);
+        }
 
         productRequestDTOs.forEach(productValidator::validate);
         throwIfInvalid(productRequestDTOs);
@@ -193,6 +207,7 @@ public class ProductServiceImpl implements ProductService {
  * @param productRequestDTOS input value
  * @return operation result
      */
+    @Transactional
     public ProductResponseDTO updateProduct(ProductRequestDTO productRequestDTOS) {
         return updateProducts(List.of(productRequestDTOS)).getFirst();
     }
@@ -203,9 +218,11 @@ public class ProductServiceImpl implements ProductService {
  * @param productRequestDTOS input value
  * @return operation result
      */
+    @Transactional
     public List<ProductResponseDTO> updateProducts(List<ProductRequestDTO> productRequestDTOS) {
 
         validateProductRequests(productRequestDTOS);
+        validateUniqueSkus(productRequestDTOS);
 
         Set<String> productSkus = productRequestDTOS.stream()
                 .map(ProductRequestDTO::getSku)
@@ -219,6 +236,8 @@ public class ProductServiceImpl implements ProductService {
 
         productRequestDTOS.forEach(product ->
                 productValidator.validateForUpdate(product, existingProductSkus));
+        productRequestDTOS.forEach(product ->
+                productValidator.validateIdentifierMatches(product, existingProducts.get(product.getSku())));
         throwIfInvalid(productRequestDTOS);
 
         productRequestDTOS.forEach(product ->
@@ -243,8 +262,10 @@ public class ProductServiceImpl implements ProductService {
  */
 
     @Override
+    @Transactional
     public ImportResponseDTO<ProductResponseDTO> importProducts(List<ProductRequestDTO> products) {
         validateProductRequests(products);
+        validateImportIdentifiers(products);
 
         Set<String> skus = products.stream().map(ProductRequestDTO::getSku)
                 .filter(Objects::nonNull).collect(Collectors.toSet());
@@ -258,6 +279,8 @@ public class ProductServiceImpl implements ProductService {
         creates.forEach(productValidator::validate);
         updates.forEach(product ->
                 productValidator.validateForUpdate(product, existingProducts.keySet()));
+        updates.forEach(product ->
+                productValidator.validateIdentifierMatches(product, existingProducts.get(product.getSku())));
         throwIfInvalid(products);
 
         if (importProperties.getBatchSize() < 1) {
@@ -279,6 +302,15 @@ public class ProductServiceImpl implements ProductService {
                 .updated(updatedProducts)
                 .build();
     }
+
+    private void validateImportIdentifiers(List<ProductRequestDTO> products) {
+        boolean hasIdWithoutSku = products.stream().anyMatch(product ->
+                product.getId() != null && !product.getId().isBlank()
+                        && (product.getSku() == null || product.getSku().isBlank()));
+        if (hasIdWithoutSku) {
+            throw new IllegalArgumentException("SKU is required when ID is supplied for import");
+        }
+    }
 /**
  * Executes the validate product requests operation.
  *
@@ -291,6 +323,18 @@ public class ProductServiceImpl implements ProductService {
         }
         if (products.stream().anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("Product entries cannot be null");
+        }
+    }
+
+    private void validateUniqueSkus(List<ProductRequestDTO> products) {
+        Set<String> seenSkus = new java.util.HashSet<>();
+        Set<String> duplicateSkus = products.stream()
+                .map(ProductRequestDTO::getSku)
+                .filter(Objects::nonNull)
+                .filter(sku -> !seenSkus.add(sku))
+                .collect(Collectors.toSet());
+        if (!duplicateSkus.isEmpty()) {
+            throw new IllegalArgumentException("Duplicate product SKU values in request: " + duplicateSkus);
         }
     }
 /**
@@ -317,6 +361,7 @@ public class ProductServiceImpl implements ProductService {
      * Performs the delete product operation.
  * @param id input value
      */
+    @Transactional
     public void deleteProduct(String id) {
         if (!productRepository.existsById(id)) {
             throw new ProductNotFoundException(id);
@@ -332,6 +377,7 @@ public class ProductServiceImpl implements ProductService {
  */
 
     @Override
+    @Transactional
     public void deleteProductsByFilters(SearchRequestDTO<ProductField> request) {
         validateDeleteRequest(request);
         List<String> ids = mongoTemplate.find(searchQueryBuilder.build(request), ProductEntity.class)
@@ -349,6 +395,7 @@ public class ProductServiceImpl implements ProductService {
      * Performs the delete all products operation.
  * @param request input value
      */
+    @Transactional
     public void deleteAllProducts() {
         inventoryRepository.deleteAll();
         productRepository.deleteAll();

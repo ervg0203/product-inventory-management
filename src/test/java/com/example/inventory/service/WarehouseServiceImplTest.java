@@ -140,6 +140,11 @@ class WarehouseServiceImplTest {
                 warehouseMapper, warehouseValidator, new PaginationProperties(), properties,
                 mongoTemplate, searchQueryBuilder, searchCriteriaBuilder);
         assertThrows(IllegalArgumentException.class, () -> badBatch.importWarehouses(List.of(create)));
+        WarehouseRequestDTO idOnly = WarehouseRequestDTO.builder().id("w").isValid(true).build();
+        assertThrows(IllegalArgumentException.class, () -> service.importWarehouses(List.of(idOnly)));
+        WarehouseRequestDTO duplicate = WarehouseRequestDTO.builder().code("DUP").isValid(true).build();
+        assertThrows(IllegalArgumentException.class,
+                () -> service.updateWarehouses(List.of(duplicate, duplicate)));
     }
 
     @Test

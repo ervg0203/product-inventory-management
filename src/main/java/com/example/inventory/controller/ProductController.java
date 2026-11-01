@@ -299,7 +299,7 @@ public class ProductController {
 
     @PutMapping("/update")
     @Operation(summary = "Update a product",
-            description = "Updates one existing product. The product ID must refer to an existing product.")
+            description = "Updates one existing product identified by its SKU. If an ID is supplied, it must match the SKU.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Product updated successfully."),
             @ApiResponse(responseCode = "400", description = "Malformed request or missing product ID."),
@@ -322,7 +322,7 @@ public class ProductController {
 
     @PutMapping("/update-multi")
     @Operation(summary = "Update products in bulk",
-            description = "Updates multiple existing products in one request. Each product ID must already exist.")
+            description = "Updates multiple existing products identified by SKU. If an ID is supplied, it must match the SKU.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Products updated successfully."),
             @ApiResponse(responseCode = "400", description = "The list is empty, contains null entries, or the request is malformed."),

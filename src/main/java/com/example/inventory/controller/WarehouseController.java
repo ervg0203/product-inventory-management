@@ -241,7 +241,7 @@ public class WarehouseController {
 
     @PutMapping("/update")
     @Operation(summary = "Update a warehouse",
-            description = "Updates one existing warehouse. The warehouse ID must refer to an existing warehouse.")
+            description = "Updates one existing warehouse identified by its code. If an ID is supplied, it must match the code.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Warehouse updated successfully."),
             @ApiResponse(responseCode = "400", description = "Malformed request or missing warehouse ID."),
@@ -264,7 +264,7 @@ public class WarehouseController {
 
     @PutMapping("/update-multi")
     @Operation(summary = "Update warehouses in bulk",
-            description = "Updates multiple existing warehouses in one request. Each warehouse ID must already exist.")
+            description = "Updates multiple existing warehouses identified by code. If an ID is supplied, it must match the code.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Warehouses updated successfully."),
             @ApiResponse(responseCode = "400", description = "The list is empty, contains null entries, or the request is malformed."),
