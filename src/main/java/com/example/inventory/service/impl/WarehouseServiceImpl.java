@@ -26,7 +26,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import com.example.inventory.util.SearchQueryBuilder;
 import com.example.inventory.util.SearchCriteriaBuilder;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,7 +155,6 @@ public class WarehouseServiceImpl implements WarehouseService {
  * @param request input value
  * @return operation result
      */
-    @Transactional
     public WarehouseResponseDTO createWarehouse(WarehouseRequestDTO request) {
         return createWarehouses(List.of(request)).getFirst();
     }
@@ -167,7 +165,6 @@ public class WarehouseServiceImpl implements WarehouseService {
  * @param requests input value
  * @return operation result
      */
-    @Transactional
     public List<WarehouseResponseDTO> createWarehouses(List<WarehouseRequestDTO> requests) {
         validateRequests(requests);
         validateUniqueCodes(requests);
@@ -193,7 +190,6 @@ public class WarehouseServiceImpl implements WarehouseService {
  * @param request input value
  * @return operation result
      */
-    @Transactional
     public WarehouseResponseDTO updateWarehouse(WarehouseRequestDTO request) {
         return updateWarehouses(List.of(request)).getFirst();
     }
@@ -204,7 +200,6 @@ public class WarehouseServiceImpl implements WarehouseService {
  * @param requests input value
  * @return operation result
      */
-    @Transactional
     public List<WarehouseResponseDTO> updateWarehouses(List<WarehouseRequestDTO> requests) {
         validateRequests(requests);
         validateUniqueCodes(requests);
@@ -229,7 +224,6 @@ public class WarehouseServiceImpl implements WarehouseService {
  */
 
     @Override
-    @Transactional
     public ImportResponseDTO<WarehouseResponseDTO> importWarehouses(List<WarehouseRequestDTO> warehouses) {
         validateRequests(warehouses);
         validateImportIdentifiers(warehouses);
@@ -282,7 +276,6 @@ public class WarehouseServiceImpl implements WarehouseService {
      * Performs the delete warehouse operation.
  * @param id input value
      */
-    @Transactional
     public void deleteWarehouse(String id) {
         if (!warehouseRepository.existsById(id)) {
             throw new WarehouseNotFoundException(id);
@@ -298,7 +291,6 @@ public class WarehouseServiceImpl implements WarehouseService {
  */
 
     @Override
-    @Transactional
     public void deleteWarehousesByFilters(SearchRequestDTO<WarehouseField> request) {
         if (request == null || request.getFilters() == null || request.getFilters().isEmpty()) {
             throw new IllegalArgumentException("At least one filter is required");
@@ -318,7 +310,6 @@ public class WarehouseServiceImpl implements WarehouseService {
      * Performs the delete all warehouses operation.
  * @param requests input value
      */
-    @Transactional
     public void deleteAllWarehouses() {
         inventoryRepository.deleteAll();
         warehouseRepository.deleteAll();

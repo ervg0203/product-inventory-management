@@ -28,7 +28,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -58,7 +57,6 @@ public class InventoryServiceImpl implements InventoryService {
  * @param request input value
  * @return operation result
      */
-    @Transactional
     public InventoryResponseDTO createInventory(InventoryRequestDTO request) {
         requireProduct(request.getProductId());
         requireActiveWarehouse(request.getWarehouseId());
@@ -85,7 +83,6 @@ public class InventoryServiceImpl implements InventoryService {
  */
 
     @Override
-    @Transactional
     public List<InventoryResponseDTO> createInventories(List<InventoryRequestDTO> requests) {
         validateRequests(requests);
         validateUniqueProductWarehousePairs(requests);
@@ -110,7 +107,6 @@ public class InventoryServiceImpl implements InventoryService {
  */
 
     @Override
-    @Transactional
     public List<InventoryResponseDTO> updateInventories(List<InventoryRequestDTO> requests) {
         validateRequests(requests);
         validateUniqueInventoryIds(requests);

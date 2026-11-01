@@ -55,7 +55,7 @@ A Spring Boot REST API for managing products, warehouses, and stock held across 
 By default, the application connects to:
 
 ```text
-mongodb://localhost:27017/inventory
+mongodb://localhost:27017/inventory?retryWrites=false
 ```
 
 ## Running locally
@@ -88,7 +88,7 @@ Configuration is in `src/main/resources/application.properties` and can be overr
 | Property | Default | Description |
 | --- | --- | --- |
 | `server.port` | `8090` | HTTP port. |
-| `spring.mongodb.uri` | `mongodb://localhost:27017/inventory` | MongoDB connection URI. |
+| `spring.mongodb.uri` | `mongodb://localhost:27017/inventory?retryWrites=false` | MongoDB connection URI. Set `retryWrites=false` for deployments that do not support retryable writes. |
 | `spring.data.mongodb.auto-index-creation` | `true` | Enables MongoDB index creation. |
 | `inventory.pagination.default-page` | `0` | Default zero-based page number. |
 | `inventory.pagination.default-page-size` | `20` | Default page size. |
@@ -98,7 +98,7 @@ Configuration is in `src/main/resources/application.properties` and can be overr
 For a different database, override the URI when starting the application:
 
 ```powershell
-.\gradlew.bat bootRun --args="--spring.mongodb.uri=mongodb://localhost:27017/inventory"
+.\gradlew.bat bootRun --args="--spring.mongodb.uri=mongodb://localhost:27017/inventory?retryWrites=false"
 ```
 
 ## API conventions

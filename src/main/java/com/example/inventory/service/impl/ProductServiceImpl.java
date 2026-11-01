@@ -21,7 +21,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.transaction.annotation.Transactional;
 import com.example.inventory.dto.common.SearchRequestDTO;
 import com.example.inventory.dto.common.ProductSearchQueryDTO;
 import com.example.inventory.enums.ProductField;
@@ -159,7 +158,6 @@ public class ProductServiceImpl implements ProductService {
  * @param productRequestDTO input value
  * @return operation result
      */
-    @Transactional
     public ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) {
         return createProducts(List.of(productRequestDTO)).getFirst();
     }
@@ -170,7 +168,6 @@ public class ProductServiceImpl implements ProductService {
  * @param productRequestDTOs input value
  * @return operation result
      */
-    @Transactional
     public List<ProductResponseDTO> createProducts(
             List<ProductRequestDTO> productRequestDTOs) {
 
@@ -207,7 +204,6 @@ public class ProductServiceImpl implements ProductService {
  * @param productRequestDTOS input value
  * @return operation result
      */
-    @Transactional
     public ProductResponseDTO updateProduct(ProductRequestDTO productRequestDTOS) {
         return updateProducts(List.of(productRequestDTOS)).getFirst();
     }
@@ -218,7 +214,6 @@ public class ProductServiceImpl implements ProductService {
  * @param productRequestDTOS input value
  * @return operation result
      */
-    @Transactional
     public List<ProductResponseDTO> updateProducts(List<ProductRequestDTO> productRequestDTOS) {
 
         validateProductRequests(productRequestDTOS);
@@ -262,7 +257,6 @@ public class ProductServiceImpl implements ProductService {
  */
 
     @Override
-    @Transactional
     public ImportResponseDTO<ProductResponseDTO> importProducts(List<ProductRequestDTO> products) {
         validateProductRequests(products);
         validateImportIdentifiers(products);
@@ -361,7 +355,6 @@ public class ProductServiceImpl implements ProductService {
      * Performs the delete product operation.
  * @param id input value
      */
-    @Transactional
     public void deleteProduct(String id) {
         if (!productRepository.existsById(id)) {
             throw new ProductNotFoundException(id);
@@ -377,7 +370,6 @@ public class ProductServiceImpl implements ProductService {
  */
 
     @Override
-    @Transactional
     public void deleteProductsByFilters(SearchRequestDTO<ProductField> request) {
         validateDeleteRequest(request);
         List<String> ids = mongoTemplate.find(searchQueryBuilder.build(request), ProductEntity.class)
@@ -395,7 +387,6 @@ public class ProductServiceImpl implements ProductService {
      * Performs the delete all products operation.
  * @param request input value
      */
-    @Transactional
     public void deleteAllProducts() {
         inventoryRepository.deleteAll();
         productRepository.deleteAll();
