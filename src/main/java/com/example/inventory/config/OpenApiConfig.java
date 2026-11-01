@@ -5,6 +5,9 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.BooleanSchema;
+import io.swagger.v3.oas.models.media.IntegerSchema;
+import io.swagger.v3.oas.models.headers.Header;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +50,7 @@ public class OpenApiConfig {
  * @return operation result
      */
     public OpenApiCustomizer errorResponseExamples() {
-        return openAPI -> openAPI.getPaths().values().forEach(pathItem ->
+        return openAPI -> openAPI.getPaths().forEach((path, pathItem) ->
                 pathItem.readOperations().forEach(operation -> {
                     if (operation.getResponses() == null) {
                         return;
@@ -56,11 +59,6 @@ public class OpenApiConfig {
                         if (!isDocumentedError(status) || "204".equals(status)) {
                             return;
                         }
-                        String path = openAPI.getPaths().entrySet().stream()
-                                .filter(entry -> entry.getValue() == pathItem)
-                                .map(Map.Entry::getKey)
-                                .findFirst()
-                                .orElse("");
                         MediaType mediaType = new MediaType()
                                 .schema(new ObjectSchema());
                         mediaType.addExamples("error",
@@ -69,7 +67,28 @@ public class OpenApiConfig {
                                         .value(errorExample(status, path)));
                         response.setContent(new Content().addMediaType("application/json", mediaType));
                     });
+                    if (isPaginatedPath(path) && operation.getResponses().get("200") != null) {
+                        addPaginationHeaders(operation.getResponses().get("200"));
+                    }
                 }));
+    }
+
+    private void addPaginationHeaders(io.swagger.v3.oas.models.responses.ApiResponse response) {
+        response.addHeaderObject("Total-Records", new Header().schema(new IntegerSchema()));
+        response.addHeaderObject("Page", new Header().schema(new IntegerSchema()));
+        response.addHeaderObject("Page-Size", new Header().schema(new IntegerSchema()));
+        response.addHeaderObject("Total-Pages", new Header().schema(new IntegerSchema()));
+        response.addHeaderObject("First", new Header().schema(new BooleanSchema()));
+        response.addHeaderObject("Last", new Header().schema(new BooleanSchema()));
+    }
+
+    private boolean isPaginatedPath(String path) {
+        return "/api/v1/products".equals(path)
+                || "/api/v1/products/search".equals(path)
+                || "/api/v1/products/advance-search".equals(path)
+                || "/api/v1/warehouses".equals(path)
+                || "/api/v1/warehouses/search".equals(path)
+                || "/api/v1/warehouses/advance-search".equals(path);
     }
 /**
  * Executes the is documented error operation.
@@ -126,9 +145,9 @@ public class OpenApiConfig {
             case "500" -> "An unexpected error occurred";
             default -> "Request validation failed";
         };
-        Object data = null;
+        Object payload = null;
         if ("400".equals(status)) {
-            data = null;
+            payload = null;
         } else if ("422".equals(status)) {
             message = switch (domain) {
                 case "product" -> "One or more products failed validation";
@@ -136,19 +155,23 @@ public class OpenApiConfig {
                 default -> "One or more inventory records failed validation";
             };
             if ("inventory".equals(domain)) {
-                data = java.util.List.of();
+                payload = java.util.List.of();
             } else {
                 Map<String, Object> validation = new LinkedHashMap<>();
                 validation.put("totalErrors", 1);
                 validation.put("totalIncorrectDtos", 1);
                 validation.put("incorrectDtos", java.util.List.of());
-                data = validation;
+                payload = validation;
             }
         }
         Map<String, Object> example = new LinkedHashMap<>();
         example.put("success", false);
         example.put("message", message);
-        example.put("data", data);
+        if (payload != null) {
+            String payloadKey = "product".equals(domain) ? "products"
+                    : "warehouse".equals(domain) ? "warehouses" : "inventories";
+            example.put(payloadKey, payload);
+        }
         return example;
     }
 }
