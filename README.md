@@ -103,27 +103,40 @@ For a different database, override the URI when starting the application:
 
 ## API conventions
 
-All API routes are under `/api/v1`. Unless otherwise noted, successful JSON responses use this envelope:
+All API routes are under `/api/v1`. Successful JSON responses include `success`, `message`, and a resource-specific payload key:
 
 ```json
 {
   "success": true,
   "message": "Product fetched successfully",
-  "data": {}
+  "product": {}
 }
 ```
 
-Paginated responses have this shape inside `data`:
+Resource keys use singular names for one record and plural names for lists or bulk operations:
+
+- Products: `product` or `products`
+- Warehouses: `warehouse` or `warehouses`
+- Inventory: `inventory`, `inventories`, or `productStock`
+
+Paginated product and warehouse responses return the records directly under `products` or `warehouses`. Pagination metadata is returned in response headers:
+
+```text
+Total-Records: 2
+Page: 0
+Page-Size: 20
+Total-Pages: 1
+First: true
+Last: true
+```
+
+Example paginated response body:
 
 ```json
 {
-  "content": [],
-  "totalRecords": 0,
-  "page": 0,
-  "pageSize": 20,
-  "totalPages": 0,
-  "first": true,
-  "last": true
+  "success": true,
+  "message": "Products fetched successfully",
+  "products": []
 }
 ```
 
@@ -387,7 +400,7 @@ Rows with an `id` are treated as updates; rows without an `id` are treated as cr
 {
   "success": true,
   "message": "Products imported successfully",
-  "data": {
+  "products": {
     "created": [],
     "updated": []
   }
@@ -401,10 +414,11 @@ Errors use the same response envelope with `success: false`:
 ```json
 {
   "success": false,
-  "message": "Request validation failed",
-  "data": null
+  "message": "Request validation failed"
 }
 ```
+
+When validation returns affected records, the payload uses the corresponding plural key, such as `products`, `warehouses`, or `inventories`. Null fields inside returned DTOs remain present as `null`; only a null top-level payload is omitted.
 
 Common status codes:
 
