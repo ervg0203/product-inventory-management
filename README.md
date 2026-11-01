@@ -490,10 +490,24 @@ src/
 
 No license file is currently included in the repository.
 
-## API Documentation, Presentation Files and Sample Import Data
+## Documentation and Sample Data
 
-They are available in the `docs` folder. 
+The `docs` folder contains the project documentation, presentation, and Excel files used for product import testing:
 
-The presentation file is `Product-Inventory-Management-System.pptx`. 
-The documentation file is `PRODUCT INVENTORY MANAGEMENT SYSTEM.docx`.
-The sample import data files for products are also available in the `docs` folder.
+| File | Description |
+| --- | --- |
+| `PRODUCT_INVENTORY_MANAGEMENT_SYSTEM.docx` | Detailed project documentation. |
+| `Product-Inventory-Management-System.pptx` | Project presentation. |
+| `Product Headers.xlsx` | Sample workbook containing supported product headers. |
+| `Product Correct Data.xlsx` | Valid product import data. |
+| `Product Incorrect Data.xlsx` | Product data containing validation errors for testing. |
+| `Products 10k Data.xlsx` | Large product dataset for import and performance testing. |
+
+The `docs/Screenshots` folder contains API execution screenshots for product and inventory endpoints, including successful and error scenarios for:
+
+- Product listing, search, advanced search, create, bulk create, update, bulk update, import, and delete operations.
+- Inventory create, bulk create, bulk update, stock increase, stock decrease, low-stock, product-stock, warehouse-inventory, and delete operations.
+
+Warehouse endpoints follow the same request and response patterns as the corresponding product endpoints, so separate warehouse screenshots were not added.
+
+Several endpoints have multiple screenshots to capture different request and response scenarios.
